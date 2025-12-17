@@ -27,7 +27,7 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
-          <i className="fas fa-tooth"></i>
+          {/* <i className="fas fa-tooth"></i> */}
           <h1>DentalAI Platform</h1>
           <p>Современная платформа для стоматологии</p>
         </div>
@@ -66,7 +66,7 @@ const Login = ({ onLogin }) => {
           </button>
         </form>
 
-        <div className="demo-accounts">
+        {/* <div className="demo-accounts">
           <h3>Демо-аккаунты:</h3>
           {demoLogins.map(user => (
             <div key={user.username} className="demo-account">
@@ -74,7 +74,7 @@ const Login = ({ onLogin }) => {
               <span className="role-badge">{user.role}</span>
             </div>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );

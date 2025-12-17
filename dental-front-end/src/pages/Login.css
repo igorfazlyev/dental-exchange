@@ -3,79 +3,90 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
+  background: var(--md-bg-main);
+  padding: var(--spacing-lg);
 }
 
 .login-box {
-  background: white;
-  border-radius: 16px;
-  padding: 3rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  background: var(--md-bg-paper);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-xl);
+  box-shadow: var(--md-shadow-3);
   max-width: 450px;
   width: 100%;
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-xl);
 }
 
 .login-header i {
   font-size: 4rem;
-  color: var(--primary-color);
-  margin-bottom: 1rem;
+  color: var(--md-primary);
+  margin-bottom: var(--spacing-md);
 }
 
 .login-header h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 400;
+  margin-bottom: var(--spacing-sm);
+  color: var(--md-text-primary);
+  justify-content: center;
 }
 
 .login-header p {
-  color: var(--text-secondary);
+  color: var(--md-text-secondary);
+  margin: 0;
 }
 
 .error-message {
-  background: #ffebee;
-  color: #c62828;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
+  background: rgba(244, 67, 54, 0.1);
+  color: var(--md-error);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-md);
   text-align: center;
+  border-left: 4px solid var(--md-error);
 }
 
 .login-form button {
   width: 100%;
-  margin-top: 1rem;
+  margin-top: var(--spacing-md);
 }
 
 .demo-accounts {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--border-color);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--md-divider);
 }
 
 .demo-accounts h3 {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--md-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .demo-account {
-  background: var(--bg-tertiary);
-  padding: 0.75rem;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
+  background: var(--md-bg-main);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-sm);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border: 1px solid var(--md-divider);
 }
 
 .role-badge {
-  background: var(--primary-color);
+  background: var(--md-primary);
   color: white;
-  padding: 0.25rem 0.75rem;
+  padding: 4px 12px;
   border-radius: 12px;
   font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }

@@ -4,68 +4,75 @@
   top: 0;
   height: 100vh;
   width: var(--sidebar-width);
-  background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
-  color: white;
+  background: #ffffff;
+  color: var(--md-text-primary);
   display: flex;
   flex-direction: column;
-  padding: 2rem 0;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  box-shadow: var(--md-shadow-2);
   z-index: 1000;
   overflow-y: auto;
 }
 
 .sidebar-header {
-  padding: 0 1.5rem 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 1rem;
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--md-divider);
 }
 
 .sidebar-header i {
   font-size: 2rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--spacing-sm);
   display: block;
+  color: var(--md-primary);
 }
 
 .sidebar-header h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.125rem;
+  font-weight: 500;
   margin: 0;
-  color: white;
+  color: var(--md-text-primary);
 }
 
 .sidebar-nav {
   flex: 1;
-  padding: 1rem 0;
+  padding: var(--spacing-sm) 0;
 }
 
 .nav-link {
   display: flex;
   align-items: center;
-  padding: 1rem 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
+  padding: 12px var(--spacing-lg);
+  color: var(--md-text-secondary);
   text-decoration: none;
-  transition: all 0.2s;
+  transition: var(--transition);
   border-left: 3px solid transparent;
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: var(--md-bg-hover);
+  color: var(--md-text-primary);
 }
 
 .nav-link.active {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border-left-color: #4fc3f7;
+  background: rgba(25, 118, 210, 0.08);
+  color: var(--md-primary);
+  border-left-color: var(--md-primary);
+  font-weight: 500;
 }
 
 .nav-link i {
-  margin-right: 1rem;
+  margin-right: var(--spacing-md);
   font-size: 1.25rem;
   width: 24px;
 }
 
 .logout-btn {
-  margin: 1rem 1.5rem 0;
-  width: calc(100% - 3rem);
+  margin: var(--spacing-md) var(--spacing-lg);
+  width: calc(100% - var(--spacing-xl));
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
 }

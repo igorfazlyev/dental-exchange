@@ -16,7 +16,7 @@ import PatientNewsFeed from './pages/Patient/NewsFeed'
 // Clinic pages
 import ClinicDashboard from './pages/Clinic/Dashboard'
 import ClinicIncomingOrders from './pages/Clinic/IncomingOrders'
-import ClinicPatients from './pages/Clinic/Patients' 
+import ClinicPatients from './pages/Clinic/Patients'
 import ClinicPriceList from './pages/Clinic/PriceList'
 import ClinicAnalytics from './pages/Clinic/Analytics'
 import ClinicSchedule from './pages/Clinic/Schedule'
@@ -58,7 +58,8 @@ function App() {
           {/* Patient Routes */}
           {user.role === 'patient' && (
             <>
-              <Route path="/" element={<Navigate to="/patient/scans" />} />
+              <Route path="/" element={<Navigate to="/patient/news" />} />
+              <Route path="/patient/news" element={<PatientNewsFeed />} />
               <Route path="/patient/scans" element={<PatientScans />} />
               <Route path="/patient/plan" element={<PatientTreatmentPlan />} />
               <Route path="/patient/criteria" element={<PatientCriteria />} />
@@ -66,7 +67,6 @@ function App() {
               <Route path="/patient/consultations" element={<PatientConsultations />} />
               <Route path="/patient/reviews" element={<PatientReviews />} />
               <Route path="/patient/status" element={<PatientStatusTracking />} />
-              <Route path="/patient/news" element={<PatientNewsFeed />} />
             </>
           )}
 

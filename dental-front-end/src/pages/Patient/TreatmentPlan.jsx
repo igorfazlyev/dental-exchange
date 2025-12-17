@@ -16,15 +16,66 @@ const PatientTreatmentPlan = () => {
   return (
     <div>
       <h1><i className="fas fa-file-medical"></i> План лечения</h1>
-      <h3 style={{color: '#757575', marginBottom: '2rem'}}>Результат AI-анализа от 15.11.2025</h3>
+      <h3 style={{color: 'var(--md-text-secondary)', marginBottom: 'var(--spacing-lg)'}}>
+        Результат AI-анализа от 15.11.2025
+      </h3>
 
-      {/* Specialist Recommendation */}
-      <div className="card" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white'}}>
-        <h3><i className="fas fa-user-md"></i> Рекомендация специалиста</h3>
-        <p style={{fontSize: '1.1rem', margin: 0}}>
-          <strong>Рекомендуется начать с консультации: {recommendation.specialist}</strong>
-        </p>
-        <p style={{opacity: 0.9, marginTop: '0.5rem'}}>{recommendation.reason}</p>
+      {/* Specialist Recommendation - MATERIAL DESIGN */}
+      <div className="card" style={{
+        borderLeft: '4px solid var(--md-primary)',
+        background: 'var(--md-bg-paper)'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'start',
+          gap: 'var(--spacing-md)'
+        }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            background: 'rgba(25, 118, 210, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            <i className="fas fa-user-md" style={{
+              fontSize: '1.5rem',
+              color: 'var(--md-primary)'
+            }}></i>
+          </div>
+
+          <div style={{flex: 1}}>
+            <h3 style={{
+              margin: '0 0 var(--spacing-sm) 0',
+              color: 'var(--md-text-primary)',
+              fontSize: '1rem',
+              fontWeight: '500',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              Рекомендация специалиста
+            </h3>
+
+            <p style={{
+              margin: '0 0 var(--spacing-sm) 0',
+              fontSize: '1.125rem',
+              fontWeight: '500',
+              color: 'var(--md-text-primary)'
+            }}>
+              Рекомендуется начать с консультации: <strong>{recommendation.specialist}</strong>
+            </p>
+
+            <p style={{
+              margin: 0,
+              color: 'var(--md-text-secondary)',
+              lineHeight: '1.6'
+            }}>
+              {recommendation.reason}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* CT Scan Visualization */}
@@ -35,29 +86,6 @@ const PatientTreatmentPlan = () => {
           <p>Здесь отображается 3D-визуализация КТ-снимка с маркерами проблемных зон</p>
         </div>
 
-        <h4 style={{marginTop: '2rem'}}>Обнаруженные патологии:</h4>
-        <ul style={{listStyle: 'none', padding: 0}}>
-          {diagnosisList.map(diagnosis => (
-            <li key={diagnosis.id} style={{
-              padding: '0.75rem',
-              marginBottom: '0.5rem',
-              background: diagnosis.severity === 'high' ? '#ffebee' : '#fff3e0',
-              borderRadius: '8px',
-              borderLeft: `4px solid ${diagnosis.severity === 'high' ? '#f44336' : '#ff9800'}`
-            }}>
-              <i className="fas fa-exclamation-circle" style={{marginRight: '0.5rem'}}></i>
-              {diagnosis.text}
-              {diagnosis.toothNumber && (
-                <span className="badge badge-info" style={{marginLeft: '0.5rem'}}>
-                  Зуб {diagnosis.toothNumber}
-                </span>
-              )}
-              <span className="badge badge-info" style={{marginLeft: '0.5rem'}}>
-                {diagnosis.specialization}
-              </span>
-            </li>
-          ))}
-        </ul>
       </div>
 
       {/* Treatment by Specialization */}
@@ -67,16 +95,29 @@ const PatientTreatmentPlan = () => {
         {Object.entries(costBySpec).map(([spec, data]) => (
           data.procedures.length > 0 && (
             <div key={spec} style={{
-              marginBottom: '2rem',
-              padding: '1.5rem',
-              background: '#f5f5f5',
-              borderRadius: '12px'
+              marginBottom: 'var(--spacing-lg)',
+              padding: 'var(--spacing-lg)',
+              background: 'var(--md-bg-main)',
+              borderRadius: 'var(--border-radius)',
+              border: '1px solid var(--md-divider)'
             }}>
-              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
-                <h4 style={{margin: 0}}>
-                  <i className="fas fa-stethoscope"></i> {spec}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 'var(--spacing-md)',
+                flexWrap: 'wrap',
+                gap: 'var(--spacing-sm)'
+              }}>
+                <h4 style={{margin: 0, color: 'var(--md-text-primary)'}}>
+                  <i className="fas fa-stethoscope" style={{marginRight: 'var(--spacing-sm)'}}></i>
+                  {spec}
                 </h4>
-                <div style={{fontSize: '1.25rem', fontWeight: 'bold', color: '#1976d2'}}>
+                <div style={{
+                  fontSize: '1.25rem',
+                  fontWeight: '500',
+                  color: 'var(--md-primary)'
+                }}>
                   {formatCost(data.min)} - {formatCost(data.max)}
                 </div>
               </div>
@@ -84,28 +125,32 @@ const PatientTreatmentPlan = () => {
               <table>
                 <thead>
                   <tr>
-                    <th>Процедура</th>
+                    <th>Патология</th>
                     <th>Номер зуба</th>
+                    <th>Процедура</th>
                     <th>Ориентировочная стоимость</th>
-                    <th>Приоритет</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.procedures.map(proc => (
                     <tr key={proc.id}>
-                      <td>{proc.type}</td>
+                      <td>
+                        <span style={{fontSize: '0.875rem', color: 'var(--md-text-primary)'}}>
+                          {proc.pathology}
+                        </span>
+                      </td>
                       <td>
                         {proc.toothNumber ? (
                           <span className="badge badge-info">Зуб {proc.toothNumber}</span>
                         ) : (
-                          <span style={{color: '#999'}}>—</span>
+                          <span style={{color: 'var(--md-text-disabled)'}}>—</span>
                         )}
                       </td>
-                      <td>{formatCost(proc.estimatedCost.min)} - {formatCost(proc.estimatedCost.max)}</td>
                       <td>
-                        <span className={`badge ${proc.priority === 1 ? 'badge-danger' : proc.priority === 2 ? 'badge-warning' : 'badge-info'}`}>
-                          {proc.priority === 1 ? 'Высокий' : proc.priority === 2 ? 'Средний' : 'Низкий'}
-                        </span>
+                        <strong style={{color: 'var(--md-text-primary)'}}>{proc.type}</strong>
+                      </td>
+                      <td style={{color: 'var(--md-text-secondary)'}}>
+                        {formatCost(proc.estimatedCost.min)} - {formatCost(proc.estimatedCost.max)}
                       </td>
                     </tr>
                   ))}
@@ -123,7 +168,7 @@ const PatientTreatmentPlan = () => {
             <div key={spec} className="metric-card info">
               <div className="metric-label">{spec}</div>
               <div className="metric-value">{formatCost(data.min)} - {formatCost(data.max)}</div>
-              <div style={{fontSize: '0.875rem', opacity: 0.9}}>
+              <div style={{fontSize: '0.875rem', opacity: 0.9, color: 'var(--md-text-secondary)'}}>
                 {data.procedures.length} процедур(ы)
               </div>
             </div>
@@ -131,7 +176,11 @@ const PatientTreatmentPlan = () => {
         ))}
       </div>
 
-      <button onClick={() => navigate('/patient/offers')} className="btn btn-primary btn-large" style={{width: '100%'}}>
+      <button 
+        onClick={() => navigate('/patient/offers')} 
+        className="btn btn-primary btn-large" 
+        style={{width: '100%'}}
+      >
         <i className="fas fa-hospital-alt"></i> Получить предложения от клиник
       </button>
     </div>

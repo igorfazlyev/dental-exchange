@@ -7,13 +7,13 @@ const Sidebar = ({ user, onLogout }) => {
   const isActive = (path) => location.pathname === path ? 'active' : '';
 
   const patientLinks = [
+    { path: '/patient/news', icon: 'fa-newspaper', label: 'Новости и акции' },
     { path: '/patient/scans', icon: 'fa-images', label: 'Мои снимки' },
     { path: '/patient/plan', icon: 'fa-file-medical', label: 'План лечения' },
     { path: '/patient/criteria', icon: 'fa-sliders-h', label: 'Критерии поиска' },
     { path: '/patient/offers', icon: 'fa-hospital-alt', label: 'Предложения клиник' },
     { path: '/patient/status', icon: 'fa-tasks', label: 'Статус лечения' },
     { path: '/patient/consultations', icon: 'fa-calendar-check', label: 'Консультации' },
-    { path: '/patient/news', icon: 'fa-newspaper', label: 'Новости и акции' },
     { path: '/patient/reviews', icon: 'fa-star', label: 'Отзывы' }
   ];
 
