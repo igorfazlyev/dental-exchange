@@ -25,17 +25,18 @@ import {
   PersonSearch,
   Visibility,
   LocalHospital,
-  Warning,
-  Error,
 } from '@mui/icons-material'
 import { treatmentPlan, getCostBySpecialty } from '../../data/mockData'
 
 const PatientTreatmentPlan = () => {
   const navigate = useNavigate()
+
+  // All procedures are initially selected
   const [selectedItems, setSelectedItems] = useState(
     treatmentPlan.items.map(item => item.id)
   )
 
+  // ✅ Totals (per specialty) are based ONLY on selected items
   const costBySpec = getCostBySpecialty(
     treatmentPlan.items.filter(item => selectedItems.includes(item.id))
   )
@@ -60,8 +61,10 @@ const PatientTreatmentPlan = () => {
     const allSelected = specialtyItems.every(id => selectedItems.includes(id))
 
     if (allSelected) {
+      // deselect all in this specialty
       setSelectedItems(prev => prev.filter(id => !specialtyItems.includes(id)))
     } else {
+      // select all in this specialty
       setSelectedItems(prev => [...new Set([...prev, ...specialtyItems])])
     }
   }
@@ -104,7 +107,8 @@ const PatientTreatmentPlan = () => {
                 Рекомендация специалиста
               </Typography>
               <Typography variant="h6" gutterBottom>
-                Рекомендуется начать с консультации: <strong>{treatmentPlan.recommendation.specialist}</strong>
+                Рекомендуется начать с консультации:{' '}
+                <strong>{treatmentPlan.recommendation.specialist}</strong>
               </Typography>
               <Typography variant="body2" color="text.secondary">
                 {treatmentPlan.recommendation.reason}
@@ -117,7 +121,11 @@ const PatientTreatmentPlan = () => {
       {/* CT Scan Visualization */}
       <Card sx={{ mb: 3 }} elevation={2}>
         <CardContent>
-          <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Typography
+            variant="h6"
+            gutterBottom
+            sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+          >
             <Visibility /> Визуализация снимка
           </Typography>
 
@@ -139,37 +147,6 @@ const PatientTreatmentPlan = () => {
               Здесь отображается 3D-визуализация КТ-снимка с маркерами проблемных зон
             </Typography>
           </Box>
-
-          <Typography variant="h6" gutterBottom>
-            Обнаруженные патологии:
-          </Typography>
-
-          <Alert severity="info" sx={{ mb: 2 }}>
-            Используется международная нумерация зубов FDI (11-48)
-          </Alert>
-
-          {treatmentPlan.items.map(item => (
-            <Alert
-              key={item.id}
-              severity={item.specialty === 'surgery' ? 'warning' : 'info'}
-              icon={item.specialty === 'surgery' ? <Warning /> : <MedicalServices />}
-              sx={{ mb: 1 }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-                <Typography sx={{ flex: '1 1 200px' }}>
-                  <strong>{item.pathology}</strong> - {item.procedureType}
-                </Typography>
-                {item.toothNumber && (
-                  <Chip label={`Зуб №${item.toothNumber}`} size="small" color="default" />
-                )}
-                <Chip 
-                  label={specialtyNames[item.specialty]} 
-                  size="small" 
-                  color={specialtyColors[item.specialty]} 
-                />
-              </Box>
-            </Alert>
-          ))}
         </CardContent>
       </Card>
 
@@ -183,18 +160,48 @@ const PatientTreatmentPlan = () => {
             Вы можете выбрать весь план или только часть работ
           </Typography>
 
-          {Object.entries(costBySpec).map(([specialty, data]) => (
-            data.procedures.length > 0 && (
-              <Paper key={specialty} sx={{ p: 2, mb: 2, bgcolor: 'background.default' }} variant="outlined">
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          {Object.keys(specialtyNames).map((specialty) => {
+            // all procedures of this specialty (for display)
+            const allProceduresForSpec = treatmentPlan.items.filter(
+              item => item.specialty === specialty
+            )
+
+            if (allProceduresForSpec.length === 0) return null
+
+            // selected procedures for this specialty (for totals)
+            const selectedProceduresForSpec = allProceduresForSpec.filter(item =>
+              selectedItems.includes(item.id)
+            )
+
+            const specTotals = costBySpec[specialty]
+            const specMin = specTotals?.min ?? 0
+            const specMax = specTotals?.max ?? 0
+
+            const allSelected = allProceduresForSpec.every(item =>
+              selectedItems.includes(item.id)
+            )
+            const someSelected =
+              selectedProceduresForSpec.length > 0 && !allSelected
+
+            return (
+              <Paper
+                key={specialty}
+                sx={{ p: 2, mb: 2, bgcolor: 'background.default' }}
+                variant="outlined"
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2,
+                  }}
+                >
                   <FormControlLabel
                     control={
                       <Checkbox
-                        checked={data.procedures.every(p => selectedItems.includes(p.id))}
-                        indeterminate={
-                          data.procedures.some(p => selectedItems.includes(p.id)) &&
-                          !data.procedures.every(p => selectedItems.includes(p.id))
-                        }
+                        checked={allSelected}
+                        indeterminate={someSelected}
                         onChange={() => handleSelectSpecialty(specialty)}
                       />
                     }
@@ -205,7 +212,11 @@ const PatientTreatmentPlan = () => {
                     }
                   />
                   <Chip
-                    label={`${formatCost(data.min)} - ${formatCost(data.max)}`}
+                    label={
+                      selectedProceduresForSpec.length > 0
+                        ? `${formatCost(specMin)} - ${formatCost(specMax)}`
+                        : '0 ₽'
+                    }
                     color={specialtyColors[specialty]}
                     sx={{ fontWeight: 'bold' }}
                   />
@@ -215,15 +226,23 @@ const PatientTreatmentPlan = () => {
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell padding="checkbox"></TableCell>
-                        <TableCell><strong>Номер зуба</strong></TableCell>
-                        <TableCell><strong>Патология</strong></TableCell>
-                        <TableCell><strong>Процедура</strong></TableCell>
-                        <TableCell><strong>Стоимость</strong></TableCell>
+                        <TableCell padding="checkbox" />
+                        <TableCell>
+                          <strong>Номер зуба</strong>
+                        </TableCell>
+                        <TableCell>
+                          <strong>Патология</strong>
+                        </TableCell>
+                        <TableCell>
+                          <strong>Процедура</strong>
+                        </TableCell>
+                        <TableCell>
+                          <strong>Стоимость</strong>
+                        </TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {data.procedures.map(proc => (
+                      {allProceduresForSpec.map(proc => (
                         <TableRow key={proc.id} hover>
                           <TableCell padding="checkbox">
                             <Checkbox
@@ -250,7 +269,8 @@ const PatientTreatmentPlan = () => {
                           </TableCell>
                           <TableCell>
                             <Typography variant="body2" color="text.secondary">
-                              {formatCost(proc.estimatedCostMin)} - {formatCost(proc.estimatedCostMax)}
+                              {formatCost(proc.estimatedCostMin)} -{' '}
+                              {formatCost(proc.estimatedCostMax)}
                             </Typography>
                           </TableCell>
                         </TableRow>
@@ -260,21 +280,34 @@ const PatientTreatmentPlan = () => {
                 </TableContainer>
               </Paper>
             )
-          ))}
+          })}
         </CardContent>
       </Card>
 
       {/* Cost Summary for Selected Items */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        {Object.entries(costBySpec).map(([specialty, data]) => (
-          data.procedures.length > 0 && (
+        {Object.keys(specialtyNames).map((specialty) => {
+          const specTotals = costBySpec[specialty]
+          const allProceduresForSpec = treatmentPlan.items.filter(
+            item => item.specialty === specialty
+          )
+          const selectedProceduresForSpec = allProceduresForSpec.filter(item =>
+            selectedItems.includes(item.id)
+          )
+
+          if (allProceduresForSpec.length === 0) return null
+
+          const specMin = specTotals?.min ?? 0
+          const specMax = specTotals?.max ?? 0
+
+          return (
             <Grid item xs={12} md={4} key={specialty}>
-              <Card 
-                sx={{ 
-                  borderLeft: 4, 
+              <Card
+                sx={{
+                  borderLeft: 4,
                   borderColor: `${specialtyColors[specialty]}.main`,
-                  opacity: data.procedures.some(p => selectedItems.includes(p.id)) ? 1 : 0.5,
-                }} 
+                  opacity: selectedProceduresForSpec.length > 0 ? 1 : 0.5,
+                }}
                 elevation={2}
               >
                 <CardContent>
@@ -282,20 +315,23 @@ const PatientTreatmentPlan = () => {
                     {specialtyNames[specialty]}
                   </Typography>
                   <Typography variant="h5" gutterBottom>
-                    {formatCost(data.min)} - {formatCost(data.max)}
+                    {selectedProceduresForSpec.length > 0
+                      ? `${formatCost(specMin)} - ${formatCost(specMax)}`
+                      : '0 ₽'}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {data.procedures.filter(p => selectedItems.includes(p.id)).length} / {data.procedures.length} процедур(ы)
+                    {selectedProceduresForSpec.length} / {allProceduresForSpec.length}{' '}
+                    процедур(ы)
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
           )
-        ))}
+        })}
       </Grid>
 
       <Alert severity="warning" sx={{ mb: 2 }}>
-        <strong>Обратите внимание:</strong> Стоимость является ориентировочной. 
+        <strong>Обратите внимание:</strong> Стоимость является ориентировочной.
         Точная цена будет определена после консультации в клинике.
       </Alert>
 
@@ -307,7 +343,8 @@ const PatientTreatmentPlan = () => {
         onClick={() => navigate('/patient/offers')}
         disabled={selectedItems.length === 0}
       >
-        Получить предложения от клиник ({selectedItems.length} {selectedItems.length === 1 ? 'процедура' : 'процедур'})
+        Получить предложения от клиник ({selectedItems.length}{' '}
+        {selectedItems.length === 1 ? 'процедура' : 'процедур'})
       </Button>
     </Box>
   )
