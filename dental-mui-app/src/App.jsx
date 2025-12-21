@@ -14,7 +14,9 @@ import PatientConsultations from './pages/Patient/Consultations'
 import PatientReviews from './pages/Patient/Reviews'
 
 // Clinic pages
+// Clinic pages
 import ClinicDashboard from './pages/Clinic/Dashboard'
+import ClinicProfile from './pages/Clinic/Profile'  // ✅ CORRECT
 import ClinicOrders from './pages/Clinic/Orders'
 import ClinicPatients from './pages/Clinic/Patients'
 import ClinicPriceList from './pages/Clinic/PriceList'
@@ -73,6 +75,7 @@ function App() {
             <Route path="/clinic/analytics" element={<ClinicAnalytics />} />
             <Route path="/clinic/schedule" element={<ClinicSchedule />} />
             <Route path="/clinic/complaints" element={<ClinicComplaints />} />
+            <Route path="/clinic/profile" element={<ClinicProfile />} />
           </>
         )}
 

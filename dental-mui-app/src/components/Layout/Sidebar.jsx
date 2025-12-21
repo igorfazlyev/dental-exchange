@@ -59,6 +59,7 @@ const Sidebar = ({ user, onLogout, drawerWidth }) => {
     { path: '/clinic/schedule', icon: <Schedule />, label: 'Слоты / расписание' },
     { path: '/clinic/analytics', icon: <Analytics />, label: 'Аналитика' },
     { path: '/clinic/complaints', icon: <ReportProblem />, label: 'Жалобы' },
+    { path: '/clinic/profile', icon: <Business />, label: 'Профиль клиники' },
   ]
 
   const governmentLinks = [
