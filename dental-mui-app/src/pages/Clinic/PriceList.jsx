@@ -230,7 +230,7 @@ const ClinicPriceList = () => {
                   <TableCell><strong>Название услуги</strong></TableCell>
                   <TableCell><strong>Цена</strong></TableCell>
                   <TableCell><strong>Длительность (мин)</strong></TableCell>
-                  <TableCell><strong>AI-совместимость</strong></TableCell>
+                  <TableCell><strong>AI-поддержка</strong></TableCell>
                   <TableCell><strong>Действия</strong></TableCell>
                 </TableRow>
               </TableHead>

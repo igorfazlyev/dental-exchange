@@ -33,12 +33,12 @@ const PatientTreatmentPlan = () => {
 
   // All procedures are initially selected
   const [selectedItems, setSelectedItems] = useState(
-    treatmentPlan.items.map(item => item.id)
+    treatmentPlan.items.map((item) => item.id)
   )
 
   // ✅ Totals (per specialty) are based ONLY on selected items
   const costBySpec = getCostBySpecialty(
-    treatmentPlan.items.filter(item => selectedItems.includes(item.id))
+    treatmentPlan.items.filter((item) => selectedItems.includes(item.id))
   )
 
   const formatCost = (cost) => {
@@ -46,26 +46,26 @@ const PatientTreatmentPlan = () => {
   }
 
   const handleToggleItem = (itemId) => {
-    setSelectedItems(prev =>
+    setSelectedItems((prev) =>
       prev.includes(itemId)
-        ? prev.filter(id => id !== itemId)
+        ? prev.filter((id) => id !== itemId)
         : [...prev, itemId]
     )
   }
 
   const handleSelectSpecialty = (specialty) => {
     const specialtyItems = treatmentPlan.items
-      .filter(item => item.specialty === specialty)
-      .map(item => item.id)
+      .filter((item) => item.specialty === specialty)
+      .map((item) => item.id)
 
-    const allSelected = specialtyItems.every(id => selectedItems.includes(id))
+    const allSelected = specialtyItems.every((id) => selectedItems.includes(id))
 
     if (allSelected) {
       // deselect all in this specialty
-      setSelectedItems(prev => prev.filter(id => !specialtyItems.includes(id)))
+      setSelectedItems((prev) => prev.filter((id) => !specialtyItems.includes(id)))
     } else {
       // select all in this specialty
-      setSelectedItems(prev => [...new Set([...prev, ...specialtyItems])])
+      setSelectedItems((prev) => [...new Set([...prev, ...specialtyItems])])
     }
   }
 
@@ -80,6 +80,12 @@ const PatientTreatmentPlan = () => {
     orthopedics: 'primary',
     surgery: 'warning',
   }
+
+  // ✅ Sort specialties: Orthopedics first, then Surgery, then Therapy
+  const sortedSpecialties = Object.keys(specialtyNames).sort((a, b) => {
+    const order = { orthopedics: 1, surgery: 2, therapy: 3 }
+    return order[a] - order[b]
+  })
 
   return (
     <Box>
@@ -160,16 +166,16 @@ const PatientTreatmentPlan = () => {
             Вы можете выбрать весь план или только часть работ
           </Typography>
 
-          {Object.keys(specialtyNames).map((specialty) => {
+          {sortedSpecialties.map((specialty) => {
             // all procedures of this specialty (for display)
             const allProceduresForSpec = treatmentPlan.items.filter(
-              item => item.specialty === specialty
+              (item) => item.specialty === specialty
             )
 
             if (allProceduresForSpec.length === 0) return null
 
             // selected procedures for this specialty (for totals)
-            const selectedProceduresForSpec = allProceduresForSpec.filter(item =>
+            const selectedProceduresForSpec = allProceduresForSpec.filter((item) =>
               selectedItems.includes(item.id)
             )
 
@@ -177,7 +183,7 @@ const PatientTreatmentPlan = () => {
             const specMin = specTotals?.min ?? 0
             const specMax = specTotals?.max ?? 0
 
-            const allSelected = allProceduresForSpec.every(item =>
+            const allSelected = allProceduresForSpec.every((item) =>
               selectedItems.includes(item.id)
             )
             const someSelected =
@@ -242,7 +248,7 @@ const PatientTreatmentPlan = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {allProceduresForSpec.map(proc => (
+                      {allProceduresForSpec.map((proc) => (
                         <TableRow key={proc.id} hover>
                           <TableCell padding="checkbox">
                             <Checkbox
@@ -286,12 +292,12 @@ const PatientTreatmentPlan = () => {
 
       {/* Cost Summary for Selected Items */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        {Object.keys(specialtyNames).map((specialty) => {
+        {sortedSpecialties.map((specialty) => {
           const specTotals = costBySpec[specialty]
           const allProceduresForSpec = treatmentPlan.items.filter(
-            item => item.specialty === specialty
+            (item) => item.specialty === specialty
           )
-          const selectedProceduresForSpec = allProceduresForSpec.filter(item =>
+          const selectedProceduresForSpec = allProceduresForSpec.filter((item) =>
             selectedItems.includes(item.id)
           )
 

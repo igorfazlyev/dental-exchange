@@ -11,6 +11,7 @@ import {
   Divider,
   Button,
 } from '@mui/material'
+import { alpha } from '@mui/material/styles'
 import {
   Newspaper,
   Image,
@@ -51,7 +52,12 @@ const Sidebar = ({ user, onLogout, drawerWidth }) => {
     { path: '/patient/reviews', icon: <Star />, label: 'Отзывы / жалобы' },
   ]
 
-  const clinicLinks = [
+  const clinicDoctorLinks = [
+    { path: '/clinic/patients', icon: <People />, label: 'Пациенты' },
+    { path: '/clinic/complaints', icon: <ReportProblem />, label: 'Жалобы' },
+  ]
+
+  const clinicManagerLinks = [
     { path: '/clinic/dashboard', icon: <Dashboard />, label: 'Dashboard' },
     { path: '/clinic/orders', icon: <Inbox />, label: 'Заявки / заказы' },
     { path: '/clinic/patients', icon: <People />, label: 'Пациенты' },
@@ -77,8 +83,8 @@ const Sidebar = ({ user, onLogout, drawerWidth }) => {
 
   const linksByRole = {
     patient: patientLinks,
-    clinic_doctor: clinicLinks,
-    clinic_manager: clinicLinks,
+    clinic_doctor: clinicDoctorLinks,
+    clinic_manager: clinicManagerLinks,
     government: governmentLinks,
     insurance: insuranceLinks,
   }
@@ -131,16 +137,29 @@ const Sidebar = ({ user, onLogout, drawerWidth }) => {
               component={Link}
               to={link.path}
               selected={isActive(link.path)}
-              sx={{
+              sx={(theme) => ({
+                borderRadius: 1,
+                mx: 1,
+                my: 0.5,
                 '&.Mui-selected': {
-                  backgroundColor: 'primary.light',
-                  color: 'primary.main',
+                  backgroundColor: alpha(theme.palette.primary.main, 0.08),
                   borderLeft: '3px solid',
                   borderColor: 'primary.main',
-                  '& .MuiListItemIcon-root': { color: 'primary.main' },
-                  '&:hover': { backgroundColor: 'primary.light' },
+                  '& .MuiListItemIcon-root': {
+                    color: 'primary.main',
+                  },
+                  '& .MuiListItemText-primary': {
+                    color: 'primary.main',
+                    fontWeight: 600,
+                  },
                 },
-              }}
+                '&.Mui-selected:hover': {
+                  backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                },
+                '&:hover': {
+                  backgroundColor: alpha(theme.palette.action.hover, 0.5),
+                },
+              })}
             >
               <ListItemIcon>{link.icon}</ListItemIcon>
               <ListItemText primary={link.label} />

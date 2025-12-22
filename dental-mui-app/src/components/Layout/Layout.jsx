@@ -5,18 +5,16 @@ const drawerWidth = 280
 
 const Layout = ({ user, onLogout, children }) => {
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', width: '100%' }}>
       <Sidebar user={user} onLogout={onLogout} drawerWidth={drawerWidth} />
 
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          // ❌ remove this, it causes the huge gap
-          // ml: `${drawerWidth}px`,
+          minWidth: 0, // IMPORTANT: prevents overflow/extra space in flex layouts
           p: 3,
           bgcolor: 'background.default',
-          minHeight: '100vh',
         }}
       >
         {children}

@@ -48,9 +48,9 @@ const Login = ({ onLogin }) => {
         <Card elevation={8}>
           <CardContent sx={{ p: 5 }}>
             <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <MedicalServices sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+              
               <Typography variant="h4" gutterBottom>
-                🦷 DentalAI Platform
+                🦷 Dental AI
               </Typography>
               <Typography color="text.secondary">
                 Маркетплейс стоматологических услуг
@@ -90,9 +90,10 @@ const Login = ({ onLogin }) => {
               >
                 Войти
               </Button>
+              <Box sx={{ height: 24 }} />
             </form>
 
-            <Box sx={{ mt: 4, pt: 4, borderTop: 1, borderColor: 'divider' }}>
+            {/* <Box sx={{ mt: 4, pt: 4, borderTop: 1, borderColor: 'divider' }}>
               <Typography
                 variant="overline"
                 color="text.secondary"
@@ -122,7 +123,7 @@ const Login = ({ onLogin }) => {
                   <Chip label={u.role} color="primary" size="small" />
                 </Box>
               ))}
-            </Box>
+            </Box> */}
           </CardContent>
         </Card>
       </Container>
