@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Card,
@@ -27,12 +28,14 @@ import {
   CheckCircle,
   Schedule,
   CloudUpload,
+  Assignment,
 } from '@mui/icons-material'
 import { patientScans } from '../../data/mockData'
 
 const PatientScans = () => {
   const [scans] = useState(patientScans)
   const [selectedScan, setSelectedScan] = useState(null)
+  const navigate = useNavigate()
 
   const handleViewScan = (scan) => {
     setSelectedScan(scan)
@@ -40,6 +43,10 @@ const PatientScans = () => {
 
   const handleClose = () => {
     setSelectedScan(null)
+  }
+
+  const handleGoToTreatmentPlan = () => {
+    navigate('/patient/plan')
   }
 
   const getStatusColor = (status) => {
@@ -217,12 +224,19 @@ const PatientScans = () => {
           </Alert>
         </DialogContent>
 
-        <DialogActions sx={{ p: 2 }}>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
           <Button onClick={handleClose} variant="outlined">
             Закрыть
           </Button>
-          <Button variant="contained" startIcon={<CloudUpload />}>
+          <Button variant="outlined" startIcon={<CloudUpload />}>
             Скачать снимок
+          </Button>
+          <Button 
+            variant="contained" 
+            startIcon={<Assignment />}
+            onClick={handleGoToTreatmentPlan}
+          >
+            План лечения
           </Button>
         </DialogActions>
       </Dialog>

@@ -21,9 +21,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  RadioGroup,
-  Radio,
-  FormControlLabel,
   Avatar,
 } from '@mui/material'
 import {
@@ -412,29 +409,17 @@ const PatientOffers = () => {
                 <MedicalServices color="primary" />
                 <Typography variant="h6">1. Выберите специализацию</Typography>
               </Box>
-              <FormControl fullWidth>
-                <RadioGroup
-                  value={bookingData.specialty}
-                  onChange={(e) =>
-                    handleBookingChange('specialty', e.target.value)
-                  }
-                >
-                  {selectedClinic?.specialties.map((spec) => (
-                    <FormControlLabel
-                      key={spec}
-                      value={spec}
-                      control={<Radio />}
-                      label={
-                        <Chip
-                          label={specialtyNames[spec]}
-                          color={specialtyColors[spec]}
-                          size="small"
-                        />
-                      }
-                    />
-                  ))}
-                </RadioGroup>
-              </FormControl>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                {selectedClinic?.specialties.map((spec) => (
+                  <Chip
+                    key={spec}
+                    label={specialtyNames[spec]}
+                    clickable
+                    color={bookingData.specialty === spec ? specialtyColors[spec] : 'default'}
+                    onClick={() => handleBookingChange('specialty', spec)}
+                  />
+                ))}
+              </Box>
             </Box>
 
             {/* Step 2: Choose Doctor */}
@@ -444,41 +429,53 @@ const PatientOffers = () => {
                   <Person color="primary" />
                   <Typography variant="h6">2. Выберите врача</Typography>
                 </Box>
-                <RadioGroup
-                  value={bookingData.doctor}
-                  onChange={(e) =>
-                    handleBookingChange('doctor', Number(e.target.value))
-                  }
-                >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {doctorsBySpecialty[bookingData.specialty]?.map((doctor) => (
-                    <FormControlLabel
+                    <Box
                       key={doctor.id}
-                      value={doctor.id}
-                      control={<Radio />}
-                      label={
-                        <Box
+                      onClick={() => handleBookingChange('doctor', doctor.id)}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 2,
+                        p: 2,
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: bookingData.doctor === doctor.id ? 'primary.main' : 'divider',
+                        bgcolor: bookingData.doctor === doctor.id ? 'primary.main' : 'transparent',
+                        color: bookingData.doctor === doctor.id ? 'primary.contrastText' : 'text.primary',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          bgcolor: bookingData.doctor === doctor.id ? 'primary.dark' : 'action.hover',
+                        },
+                      }}
+                    >
+                      <Avatar
+                        sx={{
+                          bgcolor: bookingData.doctor === doctor.id ? 'primary.contrastText' : 'primary.main',
+                          color: bookingData.doctor === doctor.id ? 'primary.main' : 'primary.contrastText',
+                        }}
+                      >
+                        {doctor.name.charAt(0)}
+                      </Avatar>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body1" fontWeight="medium">
+                          {doctor.name}
+                        </Typography>
+                        <Typography
+                          variant="caption"
                           sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 2,
-                            p: 1,
+                            color: bookingData.doctor === doctor.id ? 'inherit' : 'text.secondary',
+                            opacity: bookingData.doctor === doctor.id ? 0.9 : 1,
                           }}
                         >
-                          <Avatar>{doctor.name.charAt(0)}</Avatar>
-                          <Box>
-                            <Typography variant="body1">
-                              {doctor.name}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              Стаж: {doctor.experience} • Рейтинг: ★{' '}
-                              {doctor.rating}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      }
-                    />
+                          Стаж: {doctor.experience} • Рейтинг: ★ {doctor.rating}
+                        </Typography>
+                      </Box>
+                    </Box>
                   ))}
-                </RadioGroup>
+                </Box>
               </Box>
             )}
 
@@ -489,32 +486,46 @@ const PatientOffers = () => {
                   <CalendarMonth color="primary" />
                   <Typography variant="h6">3. Выберите дату</Typography>
                 </Box>
-                <RadioGroup
-                  value={bookingData.date}
-                  onChange={(e) => handleBookingChange('date', e.target.value)}
-                >
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                   {availableDates.map((dateObj) => (
-                    <FormControlLabel
+                    <Box
                       key={dateObj.date}
-                      value={dateObj.date}
-                      control={<Radio />}
-                      label={
-                        <Box>
-                          <Typography variant="body1">
-                            {new Date(dateObj.date).toLocaleDateString('ru-RU', {
-                              weekday: 'long',
-                              day: 'numeric',
-                              month: 'long',
-                            })}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            Доступно слотов: {dateObj.slots.length}
-                          </Typography>
-                        </Box>
-                      }
-                    />
+                      onClick={() => handleBookingChange('date', dateObj.date)}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        p: 2,
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: bookingData.date === dateObj.date ? 'primary.main' : 'divider',
+                        bgcolor: bookingData.date === dateObj.date ? 'primary.main' : 'transparent',
+                        color: bookingData.date === dateObj.date ? 'primary.contrastText' : 'text.primary',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          bgcolor: bookingData.date === dateObj.date ? 'primary.dark' : 'action.hover',
+                        },
+                      }}
+                    >
+                      <Typography variant="body1" fontWeight="medium">
+                        {new Date(dateObj.date).toLocaleDateString('ru-RU', {
+                          weekday: 'long',
+                          day: 'numeric',
+                          month: 'long',
+                        })}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: bookingData.date === dateObj.date ? 'inherit' : 'text.secondary',
+                          opacity: bookingData.date === dateObj.date ? 0.9 : 1,
+                        }}
+                      >
+                        Доступно слотов: {dateObj.slots.length}
+                      </Typography>
+                    </Box>
                   ))}
-                </RadioGroup>
+                </Box>
               </Box>
             )}
 
