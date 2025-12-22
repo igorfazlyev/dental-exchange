@@ -1008,20 +1008,254 @@ export const insurancePortfolio = [
 // GOVERNMENT / REGULATOR DATA
 // ==========================================
 
-// Regional statistics
+// // Regional statistics
+// export const regionalStats = {
+//   region: 'Москва',
+//   totalPopulation: 12_500_000,
+//   registeredClinics: 245,
+//   activeClinics: 238,
+//   suspendedClinics: 7,
+//   totalDoctors: 3_450,
+//   totalPatients: 892_000,
+//   avgWaitTime: 4.2, // days
+//   patientSatisfaction: 4.3, // out of 5
+// }
+
+// // Clinic registry with license info
+// export const clinicRegistry = [
+//   {
+//     id: 'clinic-001',
+//     name: 'СтомаПрофи',
+//     legalName: 'ООО "СтомаПрофи"',
+//     inn: '7701234567',
+//     license: '№ ЛО-77-01-012345',
+//     licenseIssueDate: '2020-03-15',
+//     licenseValidUntil: '2030-03-15',
+//     status: 'active',
+//     address: 'г. Москва, ул. Тверская, д. 10',
+//     district: 'Центральный',
+//     director: 'Смирнов И.П.',
+//     chiefDoctor: 'Петрова А.С.',
+//     specialties: ['therapy', 'orthopedics', 'surgery'],
+//     doctorsCount: 12,
+//     patientsPerMonth: 450,
+//     complaintsCount: 2,
+//     rating: 4.8,
+//     lastInspection: '2025-06-15',
+//   },
+//   {
+//     id: 'clinic-002',
+//     name: 'Дента-Люкс',
+//     legalName: 'ООО "Дента-Люкс"',
+//     inn: '7702345678',
+//     license: '№ ЛО-77-01-023456',
+//     licenseIssueDate: '2019-05-20',
+//     licenseValidUntil: '2029-05-20',
+//     status: 'active',
+//     address: 'г. Москва, пр-т Мира, д. 45',
+//     district: 'Северный',
+//     director: 'Иванова М.В.',
+//     chiefDoctor: 'Сидоров П.К.',
+//     specialties: ['therapy', 'orthopedics'],
+//     doctorsCount: 8,
+//     patientsPerMonth: 320,
+//     complaintsCount: 1,
+//     rating: 4.6,
+//     lastInspection: '2025-08-10',
+//   },
+//   {
+//     id: 'clinic-003',
+//     name: 'ЗдравМед',
+//     legalName: 'ООО "ЗдравМед"',
+//     inn: '7703456789',
+//     license: '№ ЛО-77-01-034567',
+//     licenseIssueDate: '2021-01-10',
+//     licenseValidUntil: '2031-01-10',
+//     status: 'active',
+//     address: 'г. Москва, ул. Южная, д. 88',
+//     district: 'Южный',
+//     director: 'Козлов В.А.',
+//     chiefDoctor: 'Морозова Е.Н.',
+//     specialties: ['therapy', 'orthopedics', 'surgery'],
+//     doctorsCount: 15,
+//     patientsPerMonth: 580,
+//     complaintsCount: 3,
+//     rating: 4.5,
+//     lastInspection: '2025-09-22',
+//   },
+//   {
+//     id: 'clinic-004',
+//     name: 'Стоматология 24',
+//     legalName: 'ООО "Стоматология 24"',
+//     inn: '7704567890',
+//     license: '№ ЛО-77-01-045678',
+//     licenseIssueDate: '2018-11-05',
+//     licenseValidUntil: '2028-11-05',
+//     status: 'active',
+//     address: 'г. Москва, Ленинский пр-т, д. 120',
+//     district: 'Западный',
+//     director: 'Новиков Д.С.',
+//     chiefDoctor: 'Федорова А.П.',
+//     specialties: ['therapy', 'surgery'],
+//     doctorsCount: 10,
+//     patientsPerMonth: 410,
+//     complaintsCount: 1,
+//     rating: 4.7,
+//     lastInspection: '2025-07-18',
+//   },
+//   {
+//     id: 'clinic-005',
+//     name: 'ДентаПлюс',
+//     legalName: 'ООО "ДентаПлюс"',
+//     inn: '7705678901',
+//     license: '№ ЛО-77-01-056789',
+//     licenseIssueDate: '2022-02-28',
+//     licenseValidUntil: '2032-02-28',
+//     status: 'active',
+//     address: 'г. Москва, ул. Восточная, д. 55',
+//     district: 'Восточный',
+//     director: 'Соколов И.В.',
+//     chiefDoctor: 'Кузнецова М.И.',
+//     specialties: ['therapy', 'orthopedics', 'surgery'],
+//     doctorsCount: 18,
+//     patientsPerMonth: 620,
+//     complaintsCount: 0,
+//     rating: 4.9,
+//     lastInspection: '2025-10-05',
+//   },
+//   {
+//     id: 'clinic-006',
+//     name: 'Белый Клык',
+//     legalName: 'ООО "Белый Клык"',
+//     inn: '7706789012',
+//     license: '№ ЛО-77-01-067890',
+//     licenseIssueDate: '2017-09-12',
+//     licenseValidUntil: '2027-09-12',
+//     status: 'suspended',
+//     address: 'г. Москва, ул. Северная, д. 33',
+//     district: 'Северный',
+//     director: 'Волков С.М.',
+//     chiefDoctor: 'Лебедев А.Н.',
+//     specialties: ['therapy'],
+//     doctorsCount: 5,
+//     patientsPerMonth: 150,
+//     complaintsCount: 8,
+//     rating: 3.2,
+//     lastInspection: '2025-11-20',
+//     suspensionReason: 'Множественные нарушения санитарных норм',
+//   },
+// ]
+
+// // Regional analytics by district
+// export const districtAnalytics = [
+//   {
+//     district: 'Центральный',
+//     clinicsCount: 45,
+//     doctorsCount: 620,
+//     patientsCount: 156_000,
+//     avgWaitTime: 3.5,
+//     avgRating: 4.7,
+//     complaintsCount: 12,
+//   },
+//   {
+//     district: 'Северный',
+//     clinicsCount: 52,
+//     doctorsCount: 710,
+//     patientsCount: 178_000,
+//     avgWaitTime: 4.2,
+//     avgRating: 4.5,
+//     complaintsCount: 18,
+//   },
+//   {
+//     district: 'Южный',
+//     clinicsCount: 48,
+//     doctorsCount: 650,
+//     patientsCount: 165_000,
+//     avgWaitTime: 4.8,
+//     avgRating: 4.4,
+//     complaintsCount: 22,
+//   },
+//   {
+//     district: 'Западный',
+//     clinicsCount: 50,
+//     doctorsCount: 690,
+//     patientsCount: 172_000,
+//     avgWaitTime: 4.0,
+//     avgRating: 4.6,
+//     complaintsCount: 15,
+//   },
+//   {
+//     district: 'Восточный',
+//     clinicsCount: 50,
+//     doctorsCount: 680,
+//     patientsCount: 168_000,
+//     avgWaitTime: 4.5,
+//     avgRating: 4.5,
+//     complaintsCount: 20,
+//   },
+// ]
+
+// // Monthly treatment statistics
+// export const monthlyTreatmentStats = [
+//   { month: 'Июнь', patients: 68_200, procedures: 142_000, revenue: 856_000_000 },
+//   { month: 'Июль', patients: 71_500, procedures: 148_500, revenue: 891_000_000 },
+//   { month: 'Август', patients: 69_800, procedures: 145_200, revenue: 871_000_000 },
+//   { month: 'Сентябрь', patients: 74_200, procedures: 154_000, revenue: 924_000_000 },
+//   { month: 'Октябрь', patients: 76_500, procedures: 159_000, revenue: 954_000_000 },
+//   { month: 'Ноябрь', patients: 78_100, procedures: 162_300, revenue: 973_000_000 },
+// ]
+
+// // Specialty distribution
+// export const specialtyDistribution = [
+//   { specialty: 'Терапия', procedures: 45_600, share: 48 },
+//   { specialty: 'Ортопедия', procedures: 28_500, share: 30 },
+//   { specialty: 'Хирургия', procedures: 20_900, share: 22 },
+// ]
+
+// // Quality indicators
+// export const qualityIndicators = [
+//   {
+//     indicator: 'Соблюдение санитарных норм',
+//     compliance: 96,
+//     target: 95,
+//     status: 'good',
+//   },
+//   {
+//     indicator: 'Наличие действующих лицензий',
+//     compliance: 97,
+//     target: 100,
+//     status: 'warning',
+//   },
+//   {
+//     indicator: 'Своевременность оказания услуг',
+//     compliance: 89,
+//     target: 90,
+//     status: 'warning',
+//   },
+//   {
+//     indicator: 'Удовлетворенность пациентов',
+//     compliance: 86,
+//     target: 85,
+//     status: 'good',
+//   },
+// ]
+
+// Government / Regulator Data
+
+// Regional statistics with date tracking
 export const regionalStats = {
   region: 'Москва',
+  date: '2025-12-22', // Current date for the snapshot
   totalPopulation: 12_500_000,
   registeredClinics: 245,
   activeClinics: 238,
-  suspendedClinics: 7,
   totalDoctors: 3_450,
   totalPatients: 892_000,
   avgWaitTime: 4.2, // days
   patientSatisfaction: 4.3, // out of 5
 }
 
-// Clinic registry with license info
+// Clinic registry with license info (removed suspended clinics focus)
 export const clinicRegistry = [
   {
     id: 'clinic-001',
@@ -1123,33 +1357,13 @@ export const clinicRegistry = [
     rating: 4.9,
     lastInspection: '2025-10-05',
   },
-  {
-    id: 'clinic-006',
-    name: 'Белый Клык',
-    legalName: 'ООО "Белый Клык"',
-    inn: '7706789012',
-    license: '№ ЛО-77-01-067890',
-    licenseIssueDate: '2017-09-12',
-    licenseValidUntil: '2027-09-12',
-    status: 'suspended',
-    address: 'г. Москва, ул. Северная, д. 33',
-    district: 'Северный',
-    director: 'Волков С.М.',
-    chiefDoctor: 'Лебедев А.Н.',
-    specialties: ['therapy'],
-    doctorsCount: 5,
-    patientsPerMonth: 150,
-    complaintsCount: 8,
-    rating: 3.2,
-    lastInspection: '2025-11-20',
-    suspensionReason: 'Множественные нарушения санитарных норм',
-  },
 ]
 
-// Regional analytics by district
+// Regional analytics by district with date
 export const districtAnalytics = [
   {
     district: 'Центральный',
+    date: '2025-12-22',
     clinicsCount: 45,
     doctorsCount: 620,
     patientsCount: 156_000,
@@ -1159,6 +1373,7 @@ export const districtAnalytics = [
   },
   {
     district: 'Северный',
+    date: '2025-12-22',
     clinicsCount: 52,
     doctorsCount: 710,
     patientsCount: 178_000,
@@ -1168,6 +1383,7 @@ export const districtAnalytics = [
   },
   {
     district: 'Южный',
+    date: '2025-12-22',
     clinicsCount: 48,
     doctorsCount: 650,
     patientsCount: 165_000,
@@ -1177,6 +1393,7 @@ export const districtAnalytics = [
   },
   {
     district: 'Западный',
+    date: '2025-12-22',
     clinicsCount: 50,
     doctorsCount: 690,
     patientsCount: 172_000,
@@ -1186,6 +1403,7 @@ export const districtAnalytics = [
   },
   {
     district: 'Восточный',
+    date: '2025-12-22',
     clinicsCount: 50,
     doctorsCount: 680,
     patientsCount: 168_000,
@@ -1195,50 +1413,382 @@ export const districtAnalytics = [
   },
 ]
 
-// Monthly treatment statistics
+// Monthly treatment statistics with full dates
 export const monthlyTreatmentStats = [
-  { month: 'Июнь', patients: 68_200, procedures: 142_000, revenue: 856_000_000 },
-  { month: 'Июль', patients: 71_500, procedures: 148_500, revenue: 891_000_000 },
-  { month: 'Август', patients: 69_800, procedures: 145_200, revenue: 871_000_000 },
-  { month: 'Сентябрь', patients: 74_200, procedures: 154_000, revenue: 924_000_000 },
-  { month: 'Октябрь', patients: 76_500, procedures: 159_000, revenue: 954_000_000 },
-  { month: 'Ноябрь', patients: 78_100, procedures: 162_300, revenue: 973_000_000 },
+  { 
+    month: 'Июнь', 
+    date: '2025-06-30',
+    patients: 68_200, 
+    procedures: 142_000, 
+    revenue: 856_000_000 
+  },
+  { 
+    month: 'Июль', 
+    date: '2025-07-31',
+    patients: 71_500, 
+    procedures: 148_500, 
+    revenue: 891_000_000 
+  },
+  { 
+    month: 'Август', 
+    date: '2025-08-31',
+    patients: 69_800, 
+    procedures: 145_200, 
+    revenue: 871_000_000 
+  },
+  { 
+    month: 'Сентябрь', 
+    date: '2025-09-30',
+    patients: 74_200, 
+    procedures: 154_000, 
+    revenue: 924_000_000 
+  },
+  { 
+    month: 'Октябрь', 
+    date: '2025-10-31',
+    patients: 76_500, 
+    procedures: 159_000, 
+    revenue: 954_000_000 
+  },
+  { 
+    month: 'Ноябрь', 
+    date: '2025-11-30',
+    patients: 78_100, 
+    procedures: 162_300, 
+    revenue: 973_000_000 
+  },
 ]
 
-// Specialty distribution
+// Specialty distribution with date
 export const specialtyDistribution = [
-  { specialty: 'Терапия', procedures: 45_600, share: 48 },
-  { specialty: 'Ортопедия', procedures: 28_500, share: 30 },
-  { specialty: 'Хирургия', procedures: 20_900, share: 22 },
+  { 
+    specialty: 'Терапия', 
+    date: '2025-12-22',
+    procedures: 45_600, 
+    share: 48 
+  },
+  { 
+    specialty: 'Ортопедия', 
+    date: '2025-12-22',
+    procedures: 28_500, 
+    share: 30 
+  },
+  { 
+    specialty: 'Хирургия', 
+    date: '2025-12-22',
+    procedures: 20_900, 
+    share: 22 
+  },
 ]
 
-// Quality indicators
+// Quality indicators with measurement dates
 export const qualityIndicators = [
   {
     indicator: 'Соблюдение санитарных норм',
+    date: '2025-12-22',
     compliance: 96,
     target: 95,
     status: 'good',
   },
   {
     indicator: 'Наличие действующих лицензий',
+    date: '2025-12-22',
     compliance: 97,
     target: 100,
     status: 'warning',
   },
   {
     indicator: 'Своевременность оказания услуг',
+    date: '2025-12-22',
     compliance: 89,
     target: 90,
     status: 'warning',
   },
   {
     indicator: 'Удовлетворенность пациентов',
+    date: '2025-12-22',
     compliance: 86,
     target: 85,
     status: 'good',
   },
 ]
+
+// Customer Complaints Data
+export const customerComplaints = [
+  {
+    id: 'complaint-gov-001',
+    clinicId: 'clinic-003',
+    clinicName: 'ЗдравМед',
+    patientName: 'Анонимный пациент #4521',
+    date: '2025-12-20',
+    category: 'quality',
+    severity: 'high',
+    description: 'Некачественная установка пломбы, пломба выпала через неделю после установки',
+    status: 'under_review',
+    resolutionDate: null,
+    district: 'Южный',
+    assignedInspector: 'Инспектор Волкова М.П.',
+  },
+  {
+    id: 'complaint-gov-002',
+    clinicId: 'clinic-002',
+    clinicName: 'Дента-Люкс',
+    patientName: 'Анонимный пациент #3892',
+    date: '2025-12-18',
+    category: 'service',
+    severity: 'medium',
+    description: 'Грубое обращение медсестры, отказ в предоставлении информации о лечении',
+    status: 'resolved',
+    resolutionDate: '2025-12-21',
+    resolution: 'Проведена беседа с персоналом, принесены извинения пациенту',
+    district: 'Северный',
+    assignedInspector: 'Инспектор Сидоров А.В.',
+  },
+  {
+    id: 'complaint-gov-003',
+    clinicId: 'clinic-001',
+    clinicName: 'СтомаПрофи',
+    patientName: 'Анонимный пациент #5123',
+    date: '2025-12-15',
+    category: 'pricing',
+    severity: 'low',
+    description: 'Итоговая стоимость лечения превысила предварительную смету на 30%',
+    status: 'resolved',
+    resolutionDate: '2025-12-19',
+    resolution: 'Выявлено нарушение порядка информирования пациента. Клинике вынесено предупреждение',
+    district: 'Центральный',
+    assignedInspector: 'Инспектор Петров И.К.',
+  },
+  {
+    id: 'complaint-gov-004',
+    clinicId: 'clinic-004',
+    clinicName: 'Стоматология 24',
+    patientName: 'Анонимный пациент #6234',
+    date: '2025-12-12',
+    category: 'hygiene',
+    severity: 'critical',
+    description: 'Использование нестерильных инструментов, отсутствие одноразовых перчаток у ассистента',
+    status: 'under_review',
+    resolutionDate: null,
+    district: 'Западный',
+    assignedInspector: 'Главный инспектор Иванова Н.С.',
+    notes: 'Назначена внеплановая проверка на 2025-12-23',
+  },
+  {
+    id: 'complaint-gov-005',
+    clinicId: 'clinic-003',
+    clinicName: 'ЗдравМед',
+    patientName: 'Анонимный пациент #4892',
+    date: '2025-12-10',
+    category: 'service',
+    severity: 'medium',
+    description: 'Длительное ожидание приема (более 2 часов) без предупреждения и объяснения причин',
+    status: 'resolved',
+    resolutionDate: '2025-12-14',
+    resolution: 'Клиника внедрила систему SMS-уведомлений о задержках',
+    district: 'Южный',
+    assignedInspector: 'Инспектор Козлова Е.А.',
+  },
+  {
+    id: 'complaint-gov-006',
+    clinicId: 'clinic-001',
+    clinicName: 'СтомаПрофи',
+    patientName: 'Анонимный пациент #5567',
+    date: '2025-12-08',
+    category: 'quality',
+    severity: 'medium',
+    description: 'Осложнения после удаления зуба, неправильные рекомендации по уходу',
+    status: 'resolved',
+    resolutionDate: '2025-12-16',
+    resolution: 'Пациент повторно принят, проведена коррекция лечения бесплатно',
+    district: 'Центральный',
+    assignedInspector: 'Инспектор Волкова М.П.',
+  },
+  {
+    id: 'complaint-gov-007',
+    clinicId: 'clinic-005',
+    clinicName: 'ДентаПлюс',
+    patientName: 'Анонимный пациент #7123',
+    date: '2025-12-05',
+    category: 'pricing',
+    severity: 'low',
+    description: 'Отказ в предоставлении детализированного счета на услуги',
+    status: 'resolved',
+    resolutionDate: '2025-12-10',
+    resolution: 'Счет предоставлен, администратор прошел дополнительное обучение',
+    district: 'Восточный',
+    assignedInspector: 'Инспектор Сидоров А.В.',
+  },
+  {
+    id: 'complaint-gov-008',
+    clinicId: 'clinic-002',
+    clinicName: 'Дента-Люкс',
+    patientName: 'Анонимный пациент #3456',
+    date: '2025-12-03',
+    category: 'service',
+    severity: 'low',
+    description: 'Неудобное расписание работы, невозможность записаться на удобное время',
+    status: 'rejected',
+    resolutionDate: '2025-12-08',
+    resolution: 'Жалоба не подтверждена. Расписание соответствует установленным требованиям',
+    district: 'Северный',
+    assignedInspector: 'Инспектор Петров И.К.',
+  },
+  {
+    id: 'complaint-gov-009',
+    clinicId: 'clinic-004',
+    clinicName: 'Стоматология 24',
+    patientName: 'Анонимный пациент #6789',
+    date: '2025-11-28',
+    category: 'quality',
+    severity: 'high',
+    description: 'Неправильно установленная коронка, требуется переделка',
+    status: 'resolved',
+    resolutionDate: '2025-12-12',
+    resolution: 'Коронка переустановлена за счет клиники, пациенту компенсированы неудобства',
+    district: 'Западный',
+    assignedInspector: 'Инспектор Козлова Е.А.',
+  },
+  {
+    id: 'complaint-gov-010',
+    clinicId: 'clinic-003',
+    clinicName: 'ЗдравМед',
+    patientName: 'Анонимный пациент #4234',
+    date: '2025-11-25',
+    category: 'hygiene',
+    severity: 'medium',
+    description: 'Неприятный запах в кабинете, недостаточная уборка помещений',
+    status: 'resolved',
+    resolutionDate: '2025-12-05',
+    resolution: 'Проведена санитарная обработка, увеличена частота уборки',
+    district: 'Южный',
+    assignedInspector: 'Инспектор Волкова М.П.',
+  },
+  {
+    id: 'complaint-gov-011',
+    clinicId: 'clinic-001',
+    clinicName: 'СтомаПрофи',
+    patientName: 'Анонимный пациент #5891',
+    date: '2025-11-20',
+    category: 'service',
+    severity: 'low',
+    description: 'Отсутствие информации о правах пациента в доступном месте',
+    status: 'resolved',
+    resolutionDate: '2025-11-28',
+    resolution: 'Размещены информационные стенды во всех помещениях клиники',
+    district: 'Центральный',
+    assignedInspector: 'Инспектор Сидоров А.В.',
+  },
+  {
+    id: 'complaint-gov-012',
+    clinicId: 'clinic-005',
+    clinicName: 'ДентаПлюс',
+    patientName: 'Анонимный пациент #7456',
+    date: '2025-11-18',
+    category: 'pricing',
+    severity: 'medium',
+    description: 'Навязывание дополнительных услуг, не входящих в план лечения',
+    status: 'under_review',
+    resolutionDate: null,
+    district: 'Восточный',
+    assignedInspector: 'Инспектор Петров И.К.',
+  },
+  {
+    id: 'complaint-gov-013',
+    clinicId: 'clinic-002',
+    clinicName: 'Дента-Люкс',
+    patientName: 'Анонимный пациент #3678',
+    date: '2025-11-15',
+    category: 'quality',
+    severity: 'low',
+    description: 'Недостаточно подробная консультация перед лечением',
+    status: 'resolved',
+    resolutionDate: '2025-11-22',
+    resolution: 'Врач провел повторную консультацию, разъяснил все вопросы',
+    district: 'Северный',
+    assignedInspector: 'Инспектор Козлова Е.А.',
+  },
+  {
+    id: 'complaint-gov-014',
+    clinicId: 'clinic-004',
+    clinicName: 'Стоматология 24',
+    patientName: 'Анонимный пациент #6912',
+    date: '2025-11-10',
+    category: 'service',
+    severity: 'medium',
+    description: 'Отмена записи без предупреждения, невозможность дозвониться в клинику',
+    status: 'resolved',
+    resolutionDate: '2025-11-18',
+    resolution: 'Внедрена система автоматического подтверждения записей',
+    district: 'Западный',
+    assignedInspector: 'Инспектор Волкова М.П.',
+  },
+  {
+    id: 'complaint-gov-015',
+    clinicId: 'clinic-003',
+    clinicName: 'ЗдравМед',
+    patientName: 'Анонимный пациент #4567',
+    date: '2025-11-05',
+    category: 'hygiene',
+    severity: 'low',
+    description: 'Отсутствие дезинфицирующих средств в общедоступных местах',
+    status: 'resolved',
+    resolutionDate: '2025-11-12',
+    resolution: 'Установлены дозаторы с антисептиком во всех помещениях',
+    district: 'Южный',
+    assignedInspector: 'Инспектор Сидоров А.В.',
+  },
+]
+
+// Helper function to filter data by date range
+export const filterDataByDateRange = (data, startDate, endDate, dateField = 'date') => {
+  if (!startDate || !endDate) return data
+  
+  const start = new Date(startDate)
+  const end = new Date(endDate)
+  
+  return data.filter(item => {
+    const itemDate = new Date(item[dateField])
+    return itemDate >= start && itemDate <= end
+  })
+}
+
+// Helper function to get complaints statistics
+export const getComplaintsStatistics = (complaints) => {
+  const total = complaints.length
+  
+  const byCategory = complaints.reduce((acc, c) => {
+    acc[c.category] = (acc[c.category] || 0) + 1
+    return acc
+  }, {})
+  
+  const bySeverity = complaints.reduce((acc, c) => {
+    acc[c.severity] = (acc[c.severity] || 0) + 1
+    return acc
+  }, {})
+  
+  const byStatus = complaints.reduce((acc, c) => {
+    acc[c.status] = (acc[c.status] || 0) + 1
+    return acc
+  }, {})
+  
+  const byDistrict = complaints.reduce((acc, c) => {
+    acc[c.district] = (acc[c.district] || 0) + 1
+    return acc
+  }, {})
+  
+  const resolved = complaints.filter(c => c.status === 'resolved').length
+  const resolutionRate = total > 0 ? ((resolved / total) * 100).toFixed(1) : 0
+  
+  return {
+    total,
+    byCategory,
+    bySeverity,
+    byStatus,
+    byDistrict,
+    resolutionRate,
+  }
+}
 
 // ==========================================
 // HELPER FUNCTIONS

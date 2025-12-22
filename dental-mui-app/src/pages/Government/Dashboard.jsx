@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Box,
   Typography,
@@ -10,16 +11,34 @@ import {
   PieChart,
   TrendingUp,
   LocalHospital,
-  Warning,
+  Assessment,
 } from '@mui/icons-material'
 import {
   regionalStats,
   districtAnalytics,
   qualityIndicators,
+  customerComplaints,
+  filterDataByDateRange,
 } from '../../data/mockData'
+import PeriodSelector from '../../components/PeriodSelector'
 
 const GovernmentDashboard = () => {
+  const [dateRange, setDateRange] = useState({ startDate: null, endDate: null })
+  
   const formatNumber = (n) => n.toLocaleString('ru-RU')
+
+  // Filter data based on selected period
+  const filteredComplaints = dateRange.startDate
+    ? filterDataByDateRange(customerComplaints, dateRange.startDate, dateRange.endDate, 'date')
+    : customerComplaints
+
+  const filteredQualityIndicators = dateRange.startDate
+    ? filterDataByDateRange(qualityIndicators, dateRange.startDate, dateRange.endDate, 'date')
+    : qualityIndicators
+
+  const filteredDistrictAnalytics = dateRange.startDate
+    ? filterDataByDateRange(districtAnalytics, dateRange.startDate, dateRange.endDate, 'date')
+    : districtAnalytics
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -30,6 +49,9 @@ const GovernmentDashboard = () => {
           Сводка региона: {regionalStats.region}
         </Typography>
       </Box>
+
+      {/* Period Selector */}
+      <PeriodSelector onPeriodChange={setDateRange} defaultPeriod="last30days" />
 
       {/* KPI cards – full width responsive grid */}
       <Box
@@ -106,31 +128,34 @@ const GovernmentDashboard = () => {
             <Typography variant="h6" gutterBottom>
               Показатели качества
             </Typography>
-            {qualityIndicators.map((item, idx) => (
-              <Box key={idx} sx={{ mb: 2 }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 0.5,
-                  }}
-                >
-                  <Typography variant="body2">{item.indicator}</Typography>
-                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <Typography variant="body2">{item.compliance}%</Typography>
-                    {item.status === 'warning' && (
-                      <Warning fontSize="small" color="warning" />
-                    )}
+            {filteredQualityIndicators.length > 0 ? (
+              filteredQualityIndicators.map((item, idx) => (
+                <Box key={idx} sx={{ mb: 2 }}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      mb: 0.5,
+                    }}
+                  >
+                    <Typography variant="body2">{item.indicator}</Typography>
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                      <Typography variant="body2">{item.compliance}%</Typography>
+                    </Box>
                   </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={item.compliance}
+                    color={item.status === 'good' ? 'success' : 'warning'}
+                    sx={{ height: 8, borderRadius: 4 }}
+                  />
                 </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={item.compliance}
-                  color={item.status === 'good' ? 'success' : 'warning'}
-                  sx={{ height: 8, borderRadius: 4 }}
-                />
-              </Box>
-            ))}
+              ))
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                Нет данных за выбранный период
+              </Typography>
+            )}
           </CardContent>
         </Card>
 
@@ -141,33 +166,39 @@ const GovernmentDashboard = () => {
               Статистика по районам
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {districtAnalytics.map((d, idx) => (
-                <Box key={idx}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      mb: 0.5,
-                    }}
-                  >
-                    <Typography variant="body2" fontWeight="medium">
-                      {d.district}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Chip label={`${d.clinicsCount} клиник`} size="small" />
-                      <Chip
-                        label={`★ ${d.avgRating}`}
-                        size="small"
-                        color={d.avgRating >= 4.5 ? 'success' : 'default'}
-                      />
+              {filteredDistrictAnalytics.length > 0 ? (
+                filteredDistrictAnalytics.map((d, idx) => (
+                  <Box key={idx}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        mb: 0.5,
+                      }}
+                    >
+                      <Typography variant="body2" fontWeight="medium">
+                        {d.district}
+                      </Typography>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Chip label={`${d.clinicsCount} клиник`} size="small" />
+                        <Chip
+                          label={`★ ${d.avgRating}`}
+                          size="small"
+                          color={d.avgRating >= 4.5 ? 'success' : 'default'}
+                        />
+                      </Box>
                     </Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatNumber(d.patientsCount)} пациентов • {d.doctorsCount}{' '}
+                      врачей • {d.complaintsCount} жалоб
+                    </Typography>
                   </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {formatNumber(d.patientsCount)} пациентов • {d.doctorsCount}{' '}
-                    врачей • {d.complaintsCount} жалоб
-                  </Typography>
-                </Box>
-              ))}
+                ))
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  Нет данных за выбранный период
+                </Typography>
+              )}
             </Box>
           </CardContent>
         </Card>
@@ -208,11 +239,14 @@ const GovernmentDashboard = () => {
         <Card>
           <CardContent>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Warning color="error" />
-              <Typography variant="h6">Приостановлено лицензий</Typography>
+              <Assessment color="info" />
+              <Typography variant="h6">Жалобы за период</Typography>
             </Box>
             <Typography variant="h4">
-              {regionalStats.suspendedClinics}
+              {filteredComplaints.length}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              из {customerComplaints.length} всего
             </Typography>
           </CardContent>
         </Card>

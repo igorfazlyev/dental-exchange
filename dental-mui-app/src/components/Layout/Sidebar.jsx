@@ -35,6 +35,7 @@ import {
   Person,
   AccountBalance,
   Logout,
+  Feedback, // ADD THIS IMPORT
 } from '@mui/icons-material'
 
 const Sidebar = ({ user, onLogout, drawerWidth }) => {
@@ -68,10 +69,12 @@ const Sidebar = ({ user, onLogout, drawerWidth }) => {
     { path: '/clinic/profile', icon: <Business />, label: 'Профиль клиники' },
   ]
 
+  // UPDATE THIS SECTION
   const governmentLinks = [
     { path: '/government/dashboard', icon: <PieChart />, label: 'Сводка региона' },
     { path: '/government/analytics', icon: <Search />, label: 'Аналитика' },
     { path: '/government/clinics', icon: <Business />, label: 'Реестр клиник' },
+    { path: '/government/complaints', icon: <Feedback />, label: 'Жалобы пациентов' }, // ADD THIS LINE
   ]
 
   const insuranceLinks = [
@@ -172,7 +175,7 @@ const Sidebar = ({ user, onLogout, drawerWidth }) => {
         <Button
           fullWidth
           variant="contained"
-          color="primary"
+          color="inherited"
           startIcon={<Logout />}
           onClick={onLogout}
         >
