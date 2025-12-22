@@ -1,100 +1,576 @@
 // Mock data for Dental Platform with FDI tooth numbering and specialties
 
-// Treatment plan items with FDI numbering (11-48) and specialty classification
-export const treatmentPlanItems = [
+// ==========================================
+// SCAN-CENTRIC DATA STRUCTURE
+// ==========================================
+
+// Patient scans with treatment journey information
+export const patientScans = [
   {
-    id: '1',
-    toothNumber: 16,
-    pathology: 'Кариес',
-    procedureType: 'Пломбирование',
-    specialty: 'therapy',
-    estimatedCostMin: 3000,
-    estimatedCostMax: 5000,
-    status: 'planned',
+    id: 'SCAN-001',
+    date: '2025-11-15',
+    type: 'CT',
+    status: 'processed',
+    aiAnalyzed: true,
+    treatmentPlanId: 'PLAN-001',
+    hasOffers: true,
+    offersCount: 3,
+    consultationBooked: true,
+    consultationId: 'CONS-001',
+    treatmentStatus: 'in_progress',
+    treatmentProgress: 60,
   },
   {
-    id: '2',
-    toothNumber: 25,
-    pathology: 'Глубокий кариес',
-    procedureType: 'Лечение каналов',
-    specialty: 'therapy',
-    estimatedCostMin: 8000,
-    estimatedCostMax: 12000,
-    status: 'planned',
+    id: 'SCAN-002',
+    date: '2025-10-20',
+    type: 'Panoramic',
+    status: 'processed',
+    aiAnalyzed: true,
+    treatmentPlanId: 'PLAN-002',
+    hasOffers: true,
+    offersCount: 2,
+    consultationBooked: false,
+    consultationId: null,
+    treatmentStatus: 'pending_consultation',
+    treatmentProgress: 30,
   },
   {
-    id: '3',
-    toothNumber: 37,
-    pathology: 'Отсутствующий зуб',
-    procedureType: 'Имплантация',
-    specialty: 'orthopedics',
-    estimatedCostMin: 45000,
-    estimatedCostMax: 65000,
-    status: 'planned',
-  },
-  {
-    id: '4',
-    toothNumber: 11,
-    pathology: 'Скол',
-    procedureType: 'Керамическая коронка',
-    specialty: 'orthopedics',
-    estimatedCostMin: 25000,
-    estimatedCostMax: 35000,
-    status: 'planned',
-  },
-  {
-    id: '5',
-    toothNumber: 48,
-    pathology: 'Ретинированный зуб мудрости',
-    procedureType: 'Удаление',
-    specialty: 'surgery',
-    estimatedCostMin: 5000,
-    estimatedCostMax: 8000,
-    status: 'planned',
+    id: 'SCAN-003',
+    date: '2025-09-10',
+    type: 'CT',
+    status: 'processing',
+    aiAnalyzed: false,
+    treatmentPlanId: null,
+    hasOffers: false,
+    offersCount: 0,
+    consultationBooked: false,
+    consultationId: null,
+    treatmentStatus: 'analyzing',
+    treatmentProgress: 10,
   },
 ]
 
-// Treatment plan with AI analysis result
+// Treatment plan items with FDI numbering (11-48) and specialty classification
+export const treatmentPlanItems = {
+  'PLAN-001': [
+    {
+      id: '1',
+      toothNumber: 16,
+      pathology: 'Кариес',
+      procedureType: 'Пломбирование',
+      specialty: 'therapy',
+      estimatedCostMin: 3000,
+      estimatedCostMax: 5000,
+      status: 'completed',
+    },
+    {
+      id: '2',
+      toothNumber: 25,
+      pathology: 'Глубокий кариес',
+      procedureType: 'Лечение каналов',
+      specialty: 'therapy',
+      estimatedCostMin: 8000,
+      estimatedCostMax: 12000,
+      status: 'completed',
+    },
+    {
+      id: '3',
+      toothNumber: 37,
+      pathology: 'Отсутствующий зуб',
+      procedureType: 'Имплантация',
+      specialty: 'orthopedics',
+      estimatedCostMin: 45000,
+      estimatedCostMax: 65000,
+      status: 'in_progress',
+    },
+    {
+      id: '4',
+      toothNumber: 11,
+      pathology: 'Скол',
+      procedureType: 'Керамическая коронка',
+      specialty: 'orthopedics',
+      estimatedCostMin: 25000,
+      estimatedCostMax: 35000,
+      status: 'planned',
+    },
+    {
+      id: '5',
+      toothNumber: 48,
+      pathology: 'Ретинированный зуб мудрости',
+      procedureType: 'Удаление',
+      specialty: 'surgery',
+      estimatedCostMin: 5000,
+      estimatedCostMax: 8000,
+      status: 'planned',
+    },
+  ],
+  'PLAN-002': [
+    {
+      id: '6',
+      toothNumber: 21,
+      pathology: 'Кариес',
+      procedureType: 'Пломбирование',
+      specialty: 'therapy',
+      estimatedCostMin: 3500,
+      estimatedCostMax: 5500,
+      status: 'planned',
+    },
+    {
+      id: '7',
+      toothNumber: 22,
+      pathology: 'Кариес',
+      procedureType: 'Пломбирование',
+      specialty: 'therapy',
+      estimatedCostMin: 3500,
+      estimatedCostMax: 5500,
+      status: 'planned',
+    },
+  ],
+}
+
+// Treatment plans linked to scans
+export const treatmentPlans = {
+  'PLAN-001': {
+    id: 'PLAN-001',
+    scanId: 'SCAN-001',
+    patientId: 'patient',
+    createdAt: '2025-11-16T10:00:00Z',
+    generatedDate: '2025-11-16',
+    aiAnalyzed: true,
+    diagnosis: 'Комплексная реставрация зубного ряда',
+    priority: 'high',
+    estimatedDuration: '6-8 месяцев',
+    estimatedCost: { min: 86000, max: 125000 },
+    items: treatmentPlanItems['PLAN-001'],
+    procedures: [
+      {
+        id: 1,
+        category: 'Терапия',
+        name: 'Лечение кариеса',
+        teeth: ['16', '25'],
+        priority: 'Высокий',
+        duration: '2-3 недели',
+        cost: { min: 11000, max: 17000 },
+      },
+      {
+        id: 2,
+        category: 'Ортопедия',
+        name: 'Установка коронки',
+        teeth: ['11'],
+        priority: 'Средний',
+        duration: '3-4 недели',
+        cost: { min: 25000, max: 35000 },
+      },
+      {
+        id: 3,
+        category: 'Ортопедия',
+        name: 'Имплантация',
+        teeth: ['37'],
+        priority: 'Высокий',
+        duration: '4-6 месяцев',
+        cost: { min: 45000, max: 65000 },
+      },
+      {
+        id: 4,
+        category: 'Хирургия',
+        name: 'Удаление зуба мудрости',
+        teeth: ['48'],
+        priority: 'Средний',
+        duration: '1 день',
+        cost: { min: 5000, max: 8000 },
+      },
+    ],
+    recommendation: {
+      specialist: 'Ортопед',
+      reason: 'При наличии отсутствующих зубов или необходимости ортопедического лечения рекомендуется начать с консультации ортопеда',
+    },
+  },
+  'PLAN-002': {
+    id: 'PLAN-002',
+    scanId: 'SCAN-002',
+    patientId: 'patient',
+    createdAt: '2025-10-21T14:00:00Z',
+    generatedDate: '2025-10-21',
+    aiAnalyzed: true,
+    diagnosis: 'Терапевтическое лечение кариеса',
+    priority: 'medium',
+    estimatedDuration: '2-3 недели',
+    estimatedCost: { min: 7000, max: 11000 },
+    items: treatmentPlanItems['PLAN-002'],
+    procedures: [
+      {
+        id: 1,
+        category: 'Терапия',
+        name: 'Лечение кариеса',
+        teeth: ['21', '22'],
+        priority: 'Средний',
+        duration: '2-3 недели',
+        cost: { min: 7000, max: 11000 },
+      },
+    ],
+    recommendation: {
+      specialist: 'Терапевт',
+      reason: 'Рекомендуется начать с терапевтического лечения',
+    },
+  },
+}
+
+// Clinic offers linked to treatment plans and scans
+export const clinicOffers = [
+  {
+    id: 'offer-001',
+    treatmentPlanId: 'PLAN-001',
+    scanId: 'SCAN-001',
+    clinicId: 'clinic-001',
+    clinicName: 'СтомаПрофи',
+    city: 'Москва',
+    area: 'Центральный район',
+    specialties: ['therapy', 'orthopedics', 'surgery'],
+    priceBySpecialty: {
+      therapy: { min: 11000, max: 17000 },
+      orthopedics: { min: 65000, max: 95000 },
+      surgery: { min: 5000, max: 8000 },
+    },
+    totalPrice: { min: 81000, max: 120000 },
+    discount: '10% на полный план лечения',
+    installment: 'Рассрочка до 12 месяцев',
+    promoComment: 'Бесплатная консультация ортопеда',
+    distance: 2.5,
+    rating: 4.8,
+  },
+  {
+    id: 'offer-002',
+    treatmentPlanId: 'PLAN-001',
+    scanId: 'SCAN-001',
+    clinicId: 'clinic-002',
+    clinicName: 'Дента-Люкс',
+    city: 'Москва',
+    area: 'Северный район',
+    specialties: ['therapy', 'orthopedics', 'surgery'],
+    priceBySpecialty: {
+      therapy: { min: 12000, max: 18000 },
+      orthopedics: { min: 70000, max: 105000 },
+      surgery: { min: 6000, max: 9000 },
+    },
+    totalPrice: { min: 88000, max: 132000 },
+    discount: null,
+    installment: 'Кредит от банка-партнера',
+    promoComment: null,
+    distance: 5.3,
+    rating: 4.6,
+  },
+  {
+    id: 'offer-003',
+    treatmentPlanId: 'PLAN-001',
+    scanId: 'SCAN-001',
+    clinicId: 'clinic-003',
+    clinicName: 'ЗдравМед',
+    city: 'Москва',
+    area: 'Южный район',
+    specialties: ['therapy', 'orthopedics', 'surgery'],
+    priceBySpecialty: {
+      therapy: { min: 9000, max: 15000 },
+      orthopedics: { min: 60000, max: 85000 },
+      surgery: { min: 4500, max: 7000 },
+    },
+    totalPrice: { min: 73500, max: 107000 },
+    discount: '15% для новых пациентов',
+    installment: 'Рассрочка до 6 месяцев',
+    promoComment: 'Работаем со страховыми',
+    distance: 7.8,
+    rating: 4.5,
+  },
+  {
+    id: 'offer-004',
+    treatmentPlanId: 'PLAN-002',
+    scanId: 'SCAN-002',
+    clinicId: 'clinic-001',
+    clinicName: 'СтомаПрофи',
+    city: 'Москва',
+    area: 'Центральный район',
+    specialties: ['therapy'],
+    priceBySpecialty: {
+      therapy: { min: 7000, max: 11000 },
+    },
+    totalPrice: { min: 7000, max: 11000 },
+    discount: '10% на полный план лечения',
+    installment: 'Рассрочка до 12 месяцев',
+    promoComment: 'Бесплатная консультация',
+    distance: 2.5,
+    rating: 4.8,
+  },
+  {
+    id: 'offer-005',
+    treatmentPlanId: 'PLAN-002',
+    scanId: 'SCAN-002',
+    clinicId: 'clinic-003',
+    clinicName: 'ЗдравМед',
+    city: 'Москва',
+    area: 'Южный район',
+    specialties: ['therapy'],
+    priceBySpecialty: {
+      therapy: { min: 6500, max: 10000 },
+    },
+    totalPrice: { min: 6500, max: 10000 },
+    discount: '15% для новых пациентов',
+    installment: 'Рассрочка до 6 месяцев',
+    promoComment: 'Работаем со страховыми',
+    distance: 7.8,
+    rating: 4.5,
+  },
+]
+
+// Patient consultations linked to scans
+export const consultations = [
+  {
+    id: 'CONS-001',
+    scanId: 'SCAN-001',
+    treatmentPlanId: 'PLAN-001',
+    clinic: 'СтомаПрофи',
+    clinicId: 'clinic-001',
+    doctor: 'Смирнов Алексей Иванович',
+    specialty: 'Ортопедия',
+    date: '2025-11-25',
+    time: '14:00',
+    status: 'completed',
+    notes: 'Согласован план лечения, начало работ назначено на 2025-12-01',
+    canReview: true,
+  },
+  {
+    id: 'CONS-002',
+    scanId: 'SCAN-002',
+    treatmentPlanId: 'PLAN-002',
+    clinic: 'ЗдравМед',
+    clinicId: 'clinic-003',
+    doctor: 'Иванова Марина Сергеевна',
+    specialty: 'Терапия',
+    date: '2025-12-28',
+    time: '11:00',
+    status: 'upcoming',
+    notes: null,
+    canReview: false,
+  },
+]
+
+// Legacy consultation format (for backwards compatibility)
+export const patientConsultations = [
+  {
+    id: 'cons-001',
+    date: '2025-11-25',
+    clinicName: 'СтомаПрофи',
+    doctorName: 'Д-р Смирнов',
+    specialty: 'orthopedics',
+    results: 'План лечения согласован, начинаем с терапии',
+    nextAppointment: '2025-12-05',
+    canReview: true,
+  },
+  {
+    id: 'cons-002',
+    date: '2025-10-15',
+    clinicName: 'Дента-Люкс',
+    doctorName: 'Д-р Иванова',
+    specialty: 'therapy',
+    results: 'Профессиональная чистка выполнена',
+    nextAppointment: null,
+    canReview: true,
+  },
+]
+
+// Treatment status/tracking linked to scans
+export const treatmentTracking = {
+  'SCAN-001': {
+    scanId: 'SCAN-001',
+    treatmentPlanId: 'PLAN-001',
+    currentPhase: 'Ортопедическое лечение',
+    overallProgress: 60,
+    startDate: '2025-12-01',
+    estimatedCompletion: '2025-06-15',
+    timeline: [
+      {
+        date: '2025-11-15',
+        title: 'Снимок загружен',
+        description: 'КТ-снимок успешно загружен в систему',
+        status: 'completed',
+        type: 'scan',
+      },
+      {
+        date: '2025-11-16',
+        title: 'План лечения сформирован',
+        description: 'AI-анализ завершен, план лечения готов',
+        status: 'completed',
+        type: 'plan',
+      },
+      {
+        date: '2025-11-20',
+        title: 'Предложения от клиник получены',
+        description: 'Получено 3 предложения от клиник',
+        status: 'completed',
+        type: 'offers',
+      },
+      {
+        date: '2025-11-25',
+        title: 'Консультация в клинике',
+        description: 'Консультация в СтомаПрофи, согласован план',
+        status: 'completed',
+        type: 'consultation',
+      },
+      {
+        date: '2025-12-01',
+        title: 'Начало терапевтического лечения',
+        description: 'Лечение кариеса зубов 16, 25',
+        status: 'completed',
+        type: 'treatment',
+      },
+      {
+        date: '2025-12-15',
+        title: 'Терапия завершена',
+        description: 'Терапевтическое лечение успешно завершено',
+        status: 'completed',
+        type: 'treatment',
+      },
+      {
+        date: '2025-12-20',
+        title: 'Начало ортопедического лечения',
+        description: 'Имплантация зуба 37',
+        status: 'in_progress',
+        type: 'treatment',
+      },
+      {
+        date: '2026-04-15',
+        title: 'Установка коронки',
+        description: 'Установка керамической коронки на зуб 11',
+        status: 'pending',
+        type: 'treatment',
+      },
+      {
+        date: '2026-05-20',
+        title: 'Удаление зуба мудрости',
+        description: 'Хирургическое удаление зуба 48',
+        status: 'pending',
+        type: 'treatment',
+      },
+      {
+        date: '2026-06-15',
+        title: 'Завершение лечения',
+        description: 'Полное завершение курса лечения',
+        status: 'pending',
+        type: 'completion',
+      },
+    ],
+  },
+  'SCAN-002': {
+    scanId: 'SCAN-002',
+    treatmentPlanId: 'PLAN-002',
+    currentPhase: 'Ожидание консультации',
+    overallProgress: 30,
+    startDate: null,
+    estimatedCompletion: null,
+    timeline: [
+      {
+        date: '2025-10-20',
+        title: 'Снимок загружен',
+        description: 'Панорамный снимок успешно загружен',
+        status: 'completed',
+        type: 'scan',
+      },
+      {
+        date: '2025-10-21',
+        title: 'План лечения сформирован',
+        description: 'AI-анализ завершен, план лечения готов',
+        status: 'completed',
+        type: 'plan',
+      },
+      {
+        date: '2025-10-25',
+        title: 'Предложения от клиник получены',
+        description: 'Получено 2 предложения от клиник',
+        status: 'completed',
+        type: 'offers',
+      },
+      {
+        date: '2025-12-28',
+        title: 'Консультация в клинике',
+        description: 'Запланирована консультация в ЗдравМед',
+        status: 'upcoming',
+        type: 'consultation',
+      },
+    ],
+  },
+  'SCAN-003': {
+    scanId: 'SCAN-003',
+    treatmentPlanId: null,
+    currentPhase: 'AI-анализ',
+    overallProgress: 10,
+    startDate: null,
+    estimatedCompletion: null,
+    timeline: [
+      {
+        date: '2025-09-10',
+        title: 'Снимок загружен',
+        description: 'КТ-снимок загружен, идет обработка',
+        status: 'completed',
+        type: 'scan',
+      },
+      {
+        date: '2025-09-12',
+        title: 'AI-анализ в процессе',
+        description: 'Обработка снимка и формирование плана лечения',
+        status: 'in_progress',
+        type: 'analysis',
+      },
+    ],
+  },
+}
+
+// Treatment stages/statuses (legacy - kept for backwards compatibility)
+export const treatmentStages = [
+  {
+    id: 'stage-001',
+    name: 'Первичная консультация',
+    specialty: 'orthopedics',
+    status: 'done',
+    completedAt: '2025-11-20',
+  },
+  {
+    id: 'stage-002',
+    name: 'Терапевтическое лечение',
+    specialty: 'therapy',
+    status: 'in_progress',
+    completedAt: null,
+  },
+  {
+    id: 'stage-003',
+    name: 'Хирургическое лечение',
+    specialty: 'surgery',
+    status: 'not_started',
+    completedAt: null,
+  },
+  {
+    id: 'stage-004',
+    name: 'Ортопедическое лечение',
+    specialty: 'orthopedics',
+    status: 'not_started',
+    completedAt: null,
+  },
+]
+
+// Legacy treatment plan (kept for backwards compatibility)
 export const treatmentPlan = {
   id: 'plan-001',
   patientId: 'patient',
   createdAt: '2025-11-15T10:00:00Z',
   aiAnalyzed: true,
-  items: treatmentPlanItems,
+  items: treatmentPlanItems['PLAN-001'],
   recommendation: {
     specialist: 'Ортопед',
     reason: 'При наличии отсутствующих зубов или необходимости ортопедического лечения рекомендуется начать с консультации ортопеда',
   },
 }
 
-// Patient scans
-export const patientScans = [
-  {
-    id: 'scan-001',
-    date: '2025-11-15',
-    type: 'CT',
-    status: 'processed',
-    aiAnalyzed: true,
-  },
-  {
-    id: 'scan-002',
-    date: '2025-10-20',
-    type: 'Panoramic',
-    status: 'processed',
-    aiAnalyzed: true,
-  },
-  {
-    id: 'scan-003',
-    date: '2025-09-10',
-    type: 'CT',
-    status: 'in_progress',
-    aiAnalyzed: false,
-  },
-]
+// ==========================================
+// NEWS AND PROMOTIONS
+// ==========================================
 
-// News and promotions
-// News and promotions
-// News and promotions
 export const newsItems = [
   {
     id: 'news-001',
@@ -341,128 +817,29 @@ export const newsItems = [
   },
 ]
 
+// News feed items for dashboard
+export const newsFeedItems = newsItems.slice(0, 3).map((item) => ({
+  id: item.id,
+  type: item.type === 'promotion' ? 'promo' : item.type === 'education' ? 'article' : 'promo',
+  title: item.title,
+  content: item.content,
+  image: '🦷',
+  date: item.publishedAt,
+  clinic: item.clinic,
+  link: item.type === 'promotion' ? '/patient/offers' : null,
+}))
 
-// Clinic offers with specialty-based pricing
-export const clinicOffers = [
-  {
-    id: 'offer-001',
-    clinicId: 'clinic-001',
-    clinicName: 'СтомаПрофи',
-    city: 'Москва',
-    area: 'Центральный район',
-    specialties: ['therapy', 'orthopedics', 'surgery'],
-    priceBySpecialty: {
-      therapy: { min: 10000, max: 15000 },
-      orthopedics: { min: 65000, max: 95000 },
-      surgery: { min: 5000, max: 8000 },
-    },
-    totalPrice: { min: 80000, max: 118000 },
-    discount: '10% на полный план лечения',
-    installment: 'Рассрочка до 12 месяцев',
-    promoComment: 'Бесплатная консультация ортопеда',
-    distance: 2.5,
-    rating: 4.8,
-  },
-  {
-    id: 'offer-002',
-    clinicId: 'clinic-002',
-    clinicName: 'Дента-Люкс',
-    city: 'Москва',
-    area: 'Северный район',
-    specialties: ['therapy', 'orthopedics'],
-    priceBySpecialty: {
-      therapy: { min: 12000, max: 18000 },
-      orthopedics: { min: 70000, max: 105000 },
-    },
-    totalPrice: { min: 82000, max: 123000 },
-    discount: null,
-    installment: 'Кредит от банка-партнера',
-    promoComment: null,
-    distance: 5.3,
-    rating: 4.6,
-  },
-  {
-    id: 'offer-003',
-    clinicId: 'clinic-003',
-    clinicName: 'ЗдравМед',
-    city: 'Москва',
-    area: 'Южный район',
-    specialties: ['therapy', 'orthopedics', 'surgery'],
-    priceBySpecialty: {
-      therapy: { min: 9000, max: 13000 },
-      orthopedics: { min: 60000, max: 85000 },
-      surgery: { min: 4500, max: 7000 },
-    },
-    totalPrice: { min: 73500, max: 105000 },
-    discount: '15% для новых пациентов',
-    installment: 'Рассрочка до 6 месяцев',
-    promoComment: 'Работаем со страховыми',
-    distance: 7.8,
-    rating: 4.5,
-  },
-]
-
-// Treatment stages/statuses
-export const treatmentStages = [
-  {
-    id: 'stage-001',
-    name: 'Первичная консультация',
-    specialty: 'orthopedics',
-    status: 'done',
-    completedAt: '2025-11-20',
-  },
-  {
-    id: 'stage-002',
-    name: 'Терапевтическое лечение',
-    specialty: 'therapy',
-    status: 'in_progress',
-    completedAt: null,
-  },
-  {
-    id: 'stage-003',
-    name: 'Хирургическое лечение',
-    specialty: 'surgery',
-    status: 'not_started',
-    completedAt: null,
-  },
-  {
-    id: 'stage-004',
-    name: 'Ортопедическое лечение',
-    specialty: 'orthopedics',
-    status: 'not_started',
-    completedAt: null,
-  },
-]
-
-// Patient consultations
-export const patientConsultations = [
-  {
-    id: 'cons-001',
-    date: '2025-11-20',
-    clinicName: 'СтомаПрофи',
-    doctorName: 'Д-р Смирнов',
-    specialty: 'orthopedics',
-    results: 'План лечения согласован, начинаем с терапии',
-    nextAppointment: '2025-12-05',
-    canReview: true,
-  },
-  {
-    id: 'cons-002',
-    date: '2025-10-15',
-    clinicName: 'Дента-Люкс',
-    doctorName: 'Д-р Иванова',
-    specialty: 'therapy',
-    results: 'Профессиональная чистка выполнена',
-    nextAppointment: null,
-    canReview: true,
-  },
-]
+// ==========================================
+// CLINIC DATA
+// ==========================================
 
 // Clinic orders (for clinic dashboard)
 export const clinicOrders = [
   {
     id: 'order-001',
     patientName: 'Иван Петров',
+    scanId: 'SCAN-001',
+    treatmentPlanId: 'PLAN-001',
     status: 'in_progress',
     createdAt: '2025-11-15',
     stages: treatmentStages,
@@ -471,6 +848,8 @@ export const clinicOrders = [
   {
     id: 'order-002',
     patientName: 'Анна Сидорова',
+    scanId: 'SCAN-002',
+    treatmentPlanId: 'PLAN-002',
     status: 'new',
     createdAt: '2025-12-20',
     stages: [
@@ -487,6 +866,8 @@ export const clinicOrders = [
   {
     id: 'order-003',
     patientName: 'Петр Васильев',
+    scanId: null,
+    treatmentPlanId: null,
     status: 'completed',
     createdAt: '2025-09-01',
     stages: [
@@ -576,6 +957,7 @@ export const clinicComplaints = [
     id: 'complaint-001',
     patientName: 'Мария Иванова',
     orderId: 'order-005',
+    scanId: null,
     text: 'Долгое ожидание приема',
     status: 'in_review',
     createdAt: '2025-12-18',
@@ -585,6 +967,7 @@ export const clinicComplaints = [
     id: 'complaint-002',
     patientName: 'Сергей Петров',
     orderId: 'order-008',
+    scanId: null,
     text: 'Некачественная работа',
     status: 'resolved',
     createdAt: '2025-12-10',
@@ -593,13 +976,18 @@ export const clinicComplaints = [
   },
 ]
 
+// ==========================================
+// INSURANCE DATA
+// ==========================================
+
 // Insurance portfolio (for insurance company)
 export const insurancePortfolio = [
   {
     id: 'ins-patient-001',
     patientName: 'Иван Петров',
     policyNumber: 'POL-2025-001',
-    treatmentPlanId: 'plan-001',
+    scanId: 'SCAN-001',
+    treatmentPlanId: 'PLAN-001',
     estimatedCost: { min: 80000, max: 118000 },
     approvedLimit: 100000,
     status: 'under_review',
@@ -608,59 +996,17 @@ export const insurancePortfolio = [
     id: 'ins-patient-002',
     patientName: 'Анна Сидорова',
     policyNumber: 'POL-2025-002',
-    treatmentPlanId: 'plan-002',
+    scanId: 'SCAN-002',
+    treatmentPlanId: 'PLAN-002',
     estimatedCost: { min: 15000, max: 25000 },
     approvedLimit: 30000,
     status: 'approved',
   },
 ]
 
-// Helper function to calculate cost by specialty
-export const getCostBySpecialty = (items = treatmentPlanItems) => {
-  const result = {
-    therapy: { min: 0, max: 0, procedures: [] },
-    orthopedics: { min: 0, max: 0, procedures: [] },
-    surgery: { min: 0, max: 0, procedures: [] },
-  }
-
-  items.forEach(item => {
-    if (item.specialty && result[item.specialty]) {
-      result[item.specialty].min += item.estimatedCostMin || 0
-      result[item.specialty].max += item.estimatedCostMax || 0
-      result[item.specialty].procedures.push(item)
-    }
-  })
-
-  return result
-}
-
-// Helper to get specialist recommendation
-export const getSpecialistRecommendation = (items = treatmentPlanItems) => {
-  const hasOrthopedics = items.some(item => item.specialty === 'orthopedics')
-  const hasSurgery = items.some(item => item.specialty === 'surgery')
-  const hasTherapy = items.some(item => item.specialty === 'therapy')
-
-  if (hasOrthopedics) {
-    return {
-      specialist: 'Ортопед',
-      reason: 'При наличии отсутствующих зубов или необходимости ортопедического лечения рекомендуется начать с консультации ортопеда',
-    }
-  }
-
-  if (hasSurgery && !hasTherapy) {
-    return {
-      specialist: 'Хирург',
-      reason: 'Необходимо хирургическое вмешательство',
-    }
-  }
-
-  return {
-    specialist: 'Терапевт',
-    reason: 'Рекомендуется начать с терапевтического лечения',
-  }
-}
-
-// Government / Regulator Data
+// ==========================================
+// GOVERNMENT / REGULATOR DATA
+// ==========================================
 
 // Regional statistics
 export const regionalStats = {
@@ -893,3 +1239,56 @@ export const qualityIndicators = [
     status: 'good',
   },
 ]
+
+// ==========================================
+// HELPER FUNCTIONS
+// ==========================================
+
+// Helper function to calculate cost by specialty
+export const getCostBySpecialty = (items) => {
+  const result = {
+    therapy: { min: 0, max: 0, procedures: [] },
+    orthopedics: { min: 0, max: 0, procedures: [] },
+    surgery: { min: 0, max: 0, procedures: [] },
+  }
+
+  if (!items) return result
+
+  items.forEach((item) => {
+    if (item.specialty && result[item.specialty]) {
+      result[item.specialty].min += item.estimatedCostMin || 0
+      result[item.specialty].max += item.estimatedCostMax || 0
+      result[item.specialty].procedures.push(item)
+    }
+  })
+
+  return result
+}
+
+// Helper to get specialist recommendation
+export const getSpecialistRecommendation = (items) => {
+  if (!items) return null
+
+  const hasOrthopedics = items.some((item) => item.specialty === 'orthopedics')
+  const hasSurgery = items.some((item) => item.specialty === 'surgery')
+  const hasTherapy = items.some((item) => item.specialty === 'therapy')
+
+  if (hasOrthopedics) {
+    return {
+      specialist: 'Ортопед',
+      reason: 'При наличии отсутствующих зубов или необходимости ортопедического лечения рекомендуется начать с консультации ортопеда',
+    }
+  }
+
+  if (hasSurgery && !hasTherapy) {
+    return {
+      specialist: 'Хирург',
+      reason: 'Необходимо хирургическое вмешательство',
+    }
+  }
+
+  return {
+    specialist: 'Терапевт',
+    reason: 'Рекомендуется начать с терапевтического лечения',
+  }
+}

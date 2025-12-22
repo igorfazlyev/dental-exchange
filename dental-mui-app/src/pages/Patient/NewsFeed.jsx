@@ -3,49 +3,32 @@ import {
   Box,
   Card,
   CardContent,
-  CardActions,
   Typography,
-  Chip,
   Button,
-  Tabs,
-  Tab,
+  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   IconButton,
+  Divider,
 } from '@mui/material'
 import {
-  Newspaper,
-  Discount,
+  Campaign,
   School,
   CardGiftcard,
-  Share,
-  Favorite,
-  FavoriteBorder,
   Close,
+  CalendarToday,
+  Business,
 } from '@mui/icons-material'
 import { newsItems } from '../../data/mockData'
 
-const PatientNewsFeed = () => {
-  const [news] = useState(newsItems)
-  const [activeTab, setActiveTab] = useState('all')
-  const [favorites, setFavorites] = useState([])
-  const [openDialog, setOpenDialog] = useState(false)
+const NewsFeed = () => {
   const [selectedNews, setSelectedNews] = useState(null)
+  const [openDialog, setOpenDialog] = useState(false)
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue)
-  }
-
-  const toggleFavorite = (id) => {
-    setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    )
-  }
-
-  const handleOpenDialog = (newsItem) => {
-    setSelectedNews(newsItem)
+  const handleOpenNews = (news) => {
+    setSelectedNews(news)
     setOpenDialog(true)
   }
 
@@ -54,20 +37,20 @@ const PatientNewsFeed = () => {
     setSelectedNews(null)
   }
 
-  const getTypeIcon = (type) => {
+  const getNewsIcon = (type) => {
     switch (type) {
       case 'promotion':
-        return <Discount />
+        return <Campaign />
       case 'education':
         return <School />
       case 'bonus':
         return <CardGiftcard />
       default:
-        return <Newspaper />
+        return <Campaign />
     }
   }
 
-  const getTypeColor = (type) => {
+  const getNewsColor = (type) => {
     switch (type) {
       case 'promotion':
         return 'error'
@@ -76,11 +59,11 @@ const PatientNewsFeed = () => {
       case 'bonus':
         return 'success'
       default:
-        return 'default'
+        return 'primary'
     }
   }
 
-  const getTypeLabel = (type) => {
+  const getNewsLabel = (type) => {
     switch (type) {
       case 'promotion':
         return 'Акция'
@@ -93,157 +76,108 @@ const PatientNewsFeed = () => {
     }
   }
 
-  // Filter and sort by date (most recent first)
-  const filteredNews = (
-    activeTab === 'all' ? news : news.filter((item) => item.type === activeTab)
-  ).sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    })
+  }
+
+  const isPromotionActive = (news) => {
+    if (!news.validUntil) return true
+    return new Date(news.validUntil) >= new Date()
+  }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '100%' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <Newspaper sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
-        <Box>
-          <Typography variant="h4">Новости и акции</Typography>
-          <Typography variant="body2" color="text.secondary">
-            Актуальные предложения и полезная информация
-          </Typography>
-        </Box>
-      </Box>
+    <Box>
+      <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
+        Новости и акции
+      </Typography>
 
-      {/* Filter Tabs */}
-      <Card sx={{ mb: 3, width: '100%' }} elevation={2}>
-        <Tabs value={activeTab} onChange={handleTabChange} variant="fullWidth">
-          <Tab label="Все" value="all" />
-          <Tab
-            label="Акции"
-            value="promotion"
-            icon={<Discount />}
-            iconPosition="start"
-          />
-          <Tab
-            label="Обучение"
-            value="education"
-            icon={<School />}
-            iconPosition="start"
-          />
-          <Tab
-            label="Бонусы"
-            value="bonus"
-            icon={<CardGiftcard />}
-            iconPosition="start"
-          />
-        </Tabs>
-      </Card>
-
-      {/* News List - Full Width */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 3,
-          width: '100%',
-        }}
-      >
-        {filteredNews.map((item) => (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {newsItems.map((news) => (
           <Card
-            key={item.id}
+            key={news.id}
             elevation={2}
             sx={{
-              width: '100%',
-              maxWidth: '100%',
-              display: 'flex',
-              flexDirection: 'column',
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                boxShadow: 4,
+              },
             }}
           >
-            <CardContent sx={{ flexGrow: 1 }}>
+            <CardContent>
               <Box
                 sx={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'start',
                   mb: 2,
-                  flexWrap: 'wrap',
-                  gap: 1,
                 }}
               >
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                  <Chip
-                    icon={getTypeIcon(item.type)}
-                    label={getTypeLabel(item.type)}
-                    color={getTypeColor(item.type)}
-                    size="small"
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {new Date(item.publishedAt).toLocaleDateString('ru-RU', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })}
+                <Box sx={{ flex: 1 }}>
+                  <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+                    <Chip
+                      icon={getNewsIcon(news.type)}
+                      label={getNewsLabel(news.type)}
+                      color={getNewsColor(news.type)}
+                      size="small"
+                    />
+                    {news.clinic && (
+                      <Chip
+                        icon={<Business />}
+                        label={news.clinic}
+                        size="small"
+                        variant="outlined"
+                      />
+                    )}
+                    {news.validUntil && (
+                      <Chip
+                        icon={<CalendarToday />}
+                        label={`До ${formatDate(news.validUntil)}`}
+                        size="small"
+                        color={isPromotionActive(news) ? 'success' : 'default'}
+                        variant="outlined"
+                      />
+                    )}
+                  </Box>
+
+                  <Typography variant="h5" gutterBottom>
+                    {news.title}
                   </Typography>
+
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    {news.content}
+                  </Typography>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      mt: 2,
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      Опубликовано: {formatDate(news.publishedAt)}
+                    </Typography>
+
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleOpenNews(news)}
+                    >
+                      Подробнее
+                    </Button>
+                  </Box>
                 </Box>
-                {item.validUntil && (
-                  <Chip
-                    label={`До ${new Date(item.validUntil).toLocaleDateString(
-                      'ru-RU'
-                    )}`}
-                    size="small"
-                    variant="outlined"
-                    color="warning"
-                  />
-                )}
               </Box>
-
-              {item.clinic && (
-                <Typography variant="subtitle2" color="primary" gutterBottom>
-                  {item.clinic}
-                </Typography>
-              )}
-
-              <Typography variant="h6" gutterBottom>
-                {item.title}
-              </Typography>
-
-              <Typography variant="body2" color="text.secondary">
-                {item.content}
-              </Typography>
             </CardContent>
-
-            <CardActions>
-              <Button size="small" startIcon={<Share />}>
-                Поделиться
-              </Button>
-              <Button
-                size="small"
-                startIcon={
-                  favorites.includes(item.id) ? <Favorite /> : <FavoriteBorder />
-                }
-                onClick={() => toggleFavorite(item.id)}
-                color={favorites.includes(item.id) ? 'error' : 'default'}
-              >
-                {favorites.includes(item.id) ? 'Сохранено' : 'Сохранить'}
-              </Button>
-              <Box sx={{ flexGrow: 1 }} />
-              <Button
-                size="small"
-                variant="contained"
-                onClick={() => handleOpenDialog(item)}
-              >
-                Подробнее
-              </Button>
-            </CardActions>
           </Card>
         ))}
       </Box>
-
-      {filteredNews.length === 0 && (
-        <Card sx={{ width: '100%' }}>
-          <CardContent sx={{ textAlign: 'center', py: 6 }}>
-            <Typography variant="h6" color="text.secondary">
-              Нет новостей в этой категории
-            </Typography>
-          </CardContent>
-        </Card>
-      )}
 
       {/* News Detail Dialog */}
       <Dialog
@@ -259,78 +193,123 @@ const PatientNewsFeed = () => {
               <Box
                 sx={{
                   display: 'flex',
-                  alignItems: 'start',
                   justifyContent: 'space-between',
-                  gap: 2,
+                  alignItems: 'start',
                 }}
               >
                 <Box sx={{ flex: 1 }}>
                   <Box sx={{ display: 'flex', gap: 1, mb: 1, flexWrap: 'wrap' }}>
                     <Chip
-                      icon={getTypeIcon(selectedNews.type)}
-                      label={getTypeLabel(selectedNews.type)}
-                      color={getTypeColor(selectedNews.type)}
+                      icon={getNewsIcon(selectedNews.type)}
+                      label={getNewsLabel(selectedNews.type)}
+                      color={getNewsColor(selectedNews.type)}
                       size="small"
                     />
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center' }}>
-                      {new Date(selectedNews.publishedAt).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </Typography>
-                    {selectedNews.validUntil && (
+                    {selectedNews.clinic && (
                       <Chip
-                        label={`До ${new Date(selectedNews.validUntil).toLocaleDateString('ru-RU')}`}
+                        icon={<Business />}
+                        label={selectedNews.clinic}
                         size="small"
                         variant="outlined"
-                        color="warning"
                       />
                     )}
                   </Box>
-                  {selectedNews.clinic && (
-                    <Typography variant="subtitle2" color="primary" gutterBottom>
-                      {selectedNews.clinic}
-                    </Typography>
-                  )}
-                  <Typography variant="h6">{selectedNews.title}</Typography>
+                  <Typography variant="h5">{selectedNews.title}</Typography>
                 </Box>
-                <IconButton
-                  aria-label="close"
-                  onClick={handleCloseDialog}
-                  sx={{ mt: -1, mr: -1 }}
-                >
+                <IconButton onClick={handleCloseDialog}>
                   <Close />
                 </IconButton>
               </Box>
             </DialogTitle>
+
             <DialogContent dividers>
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="caption" color="text.secondary">
+                  Опубликовано: {formatDate(selectedNews.publishedAt)}
+                </Typography>
+                {selectedNews.validUntil && (
+                  <>
+                    {' • '}
+                    <Typography
+                      variant="caption"
+                      color={
+                        isPromotionActive(selectedNews) ? 'success.main' : 'text.secondary'
+                      }
+                      fontWeight="medium"
+                    >
+                      Действует до {formatDate(selectedNews.validUntil)}
+                    </Typography>
+                  </>
+                )}
+              </Box>
+
+              <Divider sx={{ mb: 3 }} />
+
               <Box
                 sx={{
-                  '& h3': { mt: 2, mb: 1, fontSize: '1.25rem', fontWeight: 600 },
-                  '& h4': { mt: 2, mb: 1, fontSize: '1.1rem', fontWeight: 600 },
-                  '& p': { mb: 2, lineHeight: 1.7 },
-                  '& ul': { mb: 2, pl: 3 },
-                  '& li': { mb: 1, lineHeight: 1.6 },
-                  '& strong': { fontWeight: 600 },
+                  '& h3': {
+                    fontSize: '1.5rem',
+                    fontWeight: 600,
+                    mt: 3,
+                    mb: 2,
+                    color: 'text.primary',
+                  },
+                  '& h4': {
+                    fontSize: '1.25rem',
+                    fontWeight: 600,
+                    mt: 2.5,
+                    mb: 1.5,
+                    color: 'text.primary',
+                  },
+                  '& p': {
+                    mb: 2,
+                    lineHeight: 1.7,
+                  },
+                  '& ul': {
+                    mb: 2,
+                    pl: 3,
+                  },
+                  '& li': {
+                    mb: 1,
+                    lineHeight: 1.6,
+                  },
+                  '& strong': {
+                    fontWeight: 600,
+                    color: 'text.primary',
+                  },
                 }}
                 dangerouslySetInnerHTML={{ __html: selectedNews.detailedContent }}
               />
+
+              {selectedNews.clinic && (
+                <Box
+                  sx={{
+                    mt: 4,
+                    p: 2,
+                    bgcolor: 'primary.light',
+                    borderRadius: 1,
+                    textAlign: 'center',
+                  }}
+                >
+                  <Typography variant="subtitle2" gutterBottom>
+                    Предложение от клиники
+                  </Typography>
+                  <Typography variant="h6" color="primary.dark">
+                    {selectedNews.clinic}
+                  </Typography>
+                </Box>
+              )}
             </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>Закрыть</Button>
-              <Button
-                startIcon={
-                  favorites.includes(selectedNews.id) ? <Favorite /> : <FavoriteBorder />
-                }
-                onClick={() => toggleFavorite(selectedNews.id)}
-                color={favorites.includes(selectedNews.id) ? 'error' : 'default'}
-              >
-                {favorites.includes(selectedNews.id) ? 'Сохранено' : 'Сохранить'}
+
+            <DialogActions sx={{ p: 2 }}>
+              <Button onClick={handleCloseDialog} variant="outlined">
+                Закрыть
               </Button>
-              <Button variant="contained" startIcon={<Share />}>
-                Поделиться
-              </Button>
+              {selectedNews.clinic && (
+                <Button variant="contained" onClick={handleCloseDialog}>
+                  Записаться на консультацию
+                </Button>
+              )}
             </DialogActions>
           </>
         )}
@@ -339,4 +318,4 @@ const PatientNewsFeed = () => {
   )
 }
 
-export default PatientNewsFeed
+export default NewsFeed

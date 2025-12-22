@@ -172,7 +172,7 @@ const Sidebar = ({ user, onLogout, drawerWidth }) => {
         <Button
           fullWidth
           variant="contained"
-          color="secondary"
+          color="primary"
           startIcon={<Logout />}
           onClick={onLogout}
         >

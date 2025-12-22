@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import Layout from './components/Layout/Layout'
 import Login from './pages/Login'
 import theme from './theme'
+import { ScanProvider } from './contexts/ScanContext'
 
 // Patient pages
 import PatientNewsFeed from './pages/Patient/NewsFeed'
@@ -56,130 +57,81 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Layout user={user} onLogout={handleLogout}>
-        <Routes>
-          {/* Patient routes */}
-          {user.role === 'patient' && (
-            <>
-              <Route path="/" element={<Navigate to="/patient/news" />} />
-              <Route path="/patient/news" element={<PatientNewsFeed />} />
-              <Route path="/patient/scans" element={<PatientScans />} />
-              <Route path="/patient/plan" element={<PatientTreatmentPlan />} />
-              <Route path="/patient/criteria" element={<PatientCriteria />} />
-              <Route path="/patient/offers" element={<PatientOffers />} />
-              <Route path="/patient/status" element={<PatientStatusTracking />} />
-              <Route
-                path="/patient/consultations"
-                element={<PatientConsultations />}
-              />
-              <Route path="/patient/reviews" element={<PatientReviews />} />
-            </>
-          )}
+      <ScanProvider>
+        <Layout user={user} onLogout={handleLogout}>
+          <Routes>
+            {/* Patient routes */}
+            {user.role === 'patient' && (
+              <>
+                <Route path="/" element={<Navigate to="/patient/news" />} />
+                <Route path="/patient/news" element={<PatientNewsFeed />} />
+                <Route path="/patient/scans" element={<PatientScans />} />
+                <Route path="/patient/plan/:scanId?" element={<PatientTreatmentPlan />} />
+                <Route path="/patient/criteria" element={<PatientCriteria />} />
+                <Route path="/patient/offers/:scanId?" element={<PatientOffers />} />
+                <Route path="/patient/status/:scanId?" element={<PatientStatusTracking />} />
+                <Route path="/patient/consultations" element={<PatientConsultations />} />
+                <Route path="/patient/reviews" element={<PatientReviews />} />
+              </>
+            )}
 
-          {/* Clinic routes */}
-          {(user.role === 'clinic_doctor' || user.role === 'clinic_manager') && (
-            <>
-              {/* Doctor routes - limited access */}
-              {user.role === 'clinic_doctor' && (
-                <>
-                  <Route path="/" element={<Navigate to="/clinic/patients" />} />
-                  <Route path="/clinic/patients" element={<ClinicPatients />} />
-                  <Route
-                    path="/clinic/complaints"
-                    element={<ClinicComplaints />}
-                  />
-                  <Route path="*" element={<Navigate to="/clinic/patients" />} />
-                </>
-              )}
+            {/* Clinic routes */}
+            {(user.role === 'clinic_doctor' || user.role === 'clinic_manager') && (
+              <>
+                {/* Doctor routes - limited access */}
+                {user.role === 'clinic_doctor' && (
+                  <>
+                    <Route path="/" element={<Navigate to="/clinic/patients" />} />
+                    <Route path="/clinic/patients" element={<ClinicPatients />} />
+                    <Route path="/clinic/complaints" element={<ClinicComplaints />} />
+                    <Route path="*" element={<Navigate to="/clinic/patients" />} />
+                  </>
+                )}
 
-              {/* Manager routes - full access */}
-              {user.role === 'clinic_manager' && (
-                <>
-                  <Route
-                    path="/"
-                    element={<Navigate to="/clinic/dashboard" />}
-                  />
-                  <Route
-                    path="/clinic/dashboard"
-                    element={<ClinicDashboard />}
-                  />
-                  <Route path="/clinic/orders" element={<ClinicOrders />} />
-                  <Route path="/clinic/patients" element={<ClinicPatients />} />
-                  <Route
-                    path="/clinic/pricelist"
-                    element={<ClinicPriceList />}
-                  />
-                  <Route
-                    path="/clinic/analytics"
-                    element={<ClinicAnalytics />}
-                  />
-                  <Route path="/clinic/schedule" element={<ClinicSchedule />} />
-                  <Route
-                    path="/clinic/complaints"
-                    element={<ClinicComplaints />}
-                  />
-                  <Route path="/clinic/profile" element={<ClinicProfile />} />
-                </>
-              )}
-            </>
-          )}
+                {/* Manager routes - full access */}
+                {user.role === 'clinic_manager' && (
+                  <>
+                    <Route path="/" element={<Navigate to="/clinic/dashboard" />} />
+                    <Route path="/clinic/dashboard" element={<ClinicDashboard />} />
+                    <Route path="/clinic/orders" element={<ClinicOrders />} />
+                    <Route path="/clinic/patients" element={<ClinicPatients />} />
+                    <Route path="/clinic/pricelist" element={<ClinicPriceList />} />
+                    <Route path="/clinic/analytics" element={<ClinicAnalytics />} />
+                    <Route path="/clinic/schedule" element={<ClinicSchedule />} />
+                    <Route path="/clinic/complaints" element={<ClinicComplaints />} />
+                    <Route path="/clinic/profile" element={<ClinicProfile />} />
+                  </>
+                )}
+              </>
+            )}
 
-          {/* Government routes */}
-          {user.role === 'government' && (
-            <>
-              <Route
-                path="/"
-                element={<Navigate to="/government/dashboard" />}
-              />
-              <Route
-                path="/government/dashboard"
-                element={<GovernmentDashboard />}
-              />
-              <Route
-                path="/government/analytics"
-                element={<GovernmentAnalytics />}
-              />
-              <Route
-                path="/government/clinics"
-                element={<GovernmentClinicRegistry />}
-              />
-            </>
-          )}
+            {/* Government routes */}
+            {user.role === 'government' && (
+              <>
+                <Route path="/" element={<Navigate to="/government/dashboard" />} />
+                <Route path="/government/dashboard" element={<GovernmentDashboard />} />
+                <Route path="/government/analytics" element={<GovernmentAnalytics />} />
+                <Route path="/government/clinics" element={<GovernmentClinicRegistry />} />
+              </>
+            )}
 
-          {/* Insurance routes */}
-          {user.role === 'insurance' && (
-            <>
-              <Route
-                path="/"
-                element={<Navigate to="/insurance/dashboard" />}
-              />
-              <Route
-                path="/insurance/dashboard"
-                element={<InsuranceDashboard />}
-              />
-              <Route
-                path="/insurance/portfolio"
-                element={<InsurancePatientPortfolio />}
-              />
-              <Route
-                path="/insurance/review/:id"
-                element={<InsurancePlanReview />}
-              />
-              <Route
-                path="/insurance/approvals"
-                element={<InsuranceApprovals />}
-              />
-              <Route
-                path="/insurance/analytics"
-                element={<InsuranceAnalytics />}
-              />
-            </>
-          )}
+            {/* Insurance routes */}
+            {user.role === 'insurance' && (
+              <>
+                <Route path="/" element={<Navigate to="/insurance/dashboard" />} />
+                <Route path="/insurance/dashboard" element={<InsuranceDashboard />} />
+                <Route path="/insurance/portfolio" element={<InsurancePatientPortfolio />} />
+                <Route path="/insurance/review/:id" element={<InsurancePlanReview />} />
+                <Route path="/insurance/approvals" element={<InsuranceApprovals />} />
+                <Route path="/insurance/analytics" element={<InsuranceAnalytics />} />
+              </>
+            )}
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Layout>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Layout>
+      </ScanProvider>
     </ThemeProvider>
   )
 }

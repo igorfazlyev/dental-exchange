@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useScan } from '../../contexts/ScanContext'
 import {
   Box,
   Card,
@@ -6,47 +8,49 @@ import {
   Typography,
   Button,
   Chip,
-  Grid,
-  Select,
-  MenuItem,
+  Alert,
   FormControl,
   InputLabel,
+  Select,
+  MenuItem,
   Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Rating,
-  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  Avatar,
+  IconButton,
+  TextField,
+  Grid,
 } from '@mui/material'
 import {
   LocalHospital,
-  FilterList,
   LocationOn,
   Star,
-  Discount,
-  CreditCard,
-  CalendarMonth,
+  AttachMoney,
+  Schedule,
+  CheckCircle,
+  Close,
+  CalendarToday,
+  AccessTime,
   Person,
-  MedicalServices,
 } from '@mui/icons-material'
-import { clinicOffers } from '../../data/mockData'
+import { clinicOffers, patientScans, treatmentPlans } from '../../data/mockData'
 
 const PatientOffers = () => {
-  const [offers] = useState(clinicOffers)
-  const [filters, setFilters] = useState({
-    area: 'all',
-    priceRange: 'all',
-    sortBy: 'price',
-  })
-
-  // Booking dialog state
-  const [openBooking, setOpenBooking] = useState(false)
-  const [selectedClinic, setSelectedClinic] = useState(null)
+  const { scanId } = useParams()
+  const navigate = useNavigate()
+  const { activeScanId, setActiveScanId } = useScan()
+  
+  const [selectedScanId, setSelectedScanId] = useState(
+    scanId || activeScanId || patientScans[0]?.id
+  )
+  const [selectedScan, setSelectedScan] = useState(null)
+  const [plan, setPlan] = useState(null)
+  const [offers, setOffers] = useState([])
+  
+  // Booking modal state
+  const [openBookingModal, setOpenBookingModal] = useState(false)
+  const [selectedOffer, setSelectedOffer] = useState(null)
   const [bookingData, setBookingData] = useState({
     specialty: '',
     doctor: '',
@@ -54,69 +58,136 @@ const PatientOffers = () => {
     time: '',
   })
 
-  // Mock available slots data
-  const availableDates = [
-    { date: '2025-12-23', slots: ['09:00', '11:00', '14:00', '16:00'] },
-    { date: '2025-12-24', slots: ['10:00', '13:00', '15:00'] },
-    { date: '2025-12-26', slots: ['09:00', '11:30', '14:30', '16:30'] },
-    { date: '2025-12-27', slots: ['10:00', '12:00', '15:00'] },
-  ]
-
+  // Mock data for doctors and time slots
   const doctorsBySpecialty = {
     therapy: [
-      { id: 1, name: 'Иванова Марина Сергеевна', experience: '15 лет', rating: 4.9 },
-      { id: 2, name: 'Петрова Анна Викторовна', experience: '12 лет', rating: 4.8 },
+      { id: 1, name: 'Иванова Марина Сергеевна', experience: '15 лет' },
+      { id: 2, name: 'Петров Алексей Викторович', experience: '10 лет' },
+      { id: 3, name: 'Сидорова Ольга Дмитриевна', experience: '8 лет' },
     ],
     orthopedics: [
-      { id: 3, name: 'Смирнов Алексей Иванович', experience: '20 лет', rating: 4.9 },
-      { id: 4, name: 'Козлов Дмитрий Петрович', experience: '18 лет', rating: 4.7 },
+      { id: 4, name: 'Смирнов Алексей Иванович', experience: '20 лет' },
+      { id: 5, name: 'Козлова Анна Петровна', experience: '12 лет' },
+      { id: 6, name: 'Морозов Игорь Владимирович', experience: '18 лет' },
     ],
     surgery: [
-      { id: 5, name: 'Сидорова Елена Николаевна', experience: '22 года', rating: 5.0 },
-      { id: 6, name: 'Морозов Владимир Александрович', experience: '16 лет', rating: 4.8 },
+      { id: 7, name: 'Волков Сергей Михайлович', experience: '25 лет' },
+      { id: 8, name: 'Новикова Елена Андреевна', experience: '14 лет' },
     ],
+  }
+
+  const availableTimes = [
+    '09:00',
+    '10:00',
+    '11:00',
+    '12:00',
+    '14:00',
+    '15:00',
+    '16:00',
+    '17:00',
+    '18:00',
+  ]
+
+  // Generate available dates (next 14 days, excluding Sundays)
+  const getAvailableDates = () => {
+    const dates = []
+    const today = new Date()
+    let daysAdded = 0
+    let currentDate = new Date(today)
+
+    while (daysAdded < 14) {
+      currentDate.setDate(today.getDate() + daysAdded)
+      // Skip Sundays (0)
+      if (currentDate.getDay() !== 0) {
+        dates.push(new Date(currentDate))
+      }
+      daysAdded++
+    }
+    return dates
+  }
+
+  const availableDates = getAvailableDates()
+
+  useEffect(() => {
+    if (selectedScanId) {
+      setActiveScanId(selectedScanId)
+      
+      // Find the scan
+      const scan = patientScans.find((s) => s.id === selectedScanId)
+      setSelectedScan(scan)
+
+      // Find the treatment plan for this scan
+      if (scan?.treatmentPlanId) {
+        const treatmentPlan = treatmentPlans[scan.treatmentPlanId]
+        setPlan(treatmentPlan)
+
+        // Filter offers for this scan
+        const scanOffers = clinicOffers.filter(
+          (offer) => offer.scanId === selectedScanId
+        )
+        setOffers(scanOffers)
+      } else {
+        setPlan(null)
+        setOffers([])
+      }
+    }
+  }, [selectedScanId, setActiveScanId])
+
+  const handleScanChange = (event) => {
+    const newScanId = event.target.value
+    setSelectedScanId(newScanId)
+    navigate(`/patient/offers/${newScanId}`)
+  }
+
+  const handleOpenBookingModal = (offer) => {
+    setSelectedOffer(offer)
+    setBookingData({
+      specialty: offer.specialties[0] || '', // Pre-select first specialty
+      doctor: '',
+      date: '',
+      time: '',
+    })
+    setOpenBookingModal(true)
+  }
+
+  const handleCloseBookingModal = () => {
+    setOpenBookingModal(false)
+    setSelectedOffer(null)
+    setBookingData({
+      specialty: '',
+      doctor: '',
+      date: '',
+      time: '',
+    })
+  }
+
+  const handleBookingChange = (field, value) => {
+    setBookingData((prev) => ({
+      ...prev,
+      [field]: value,
+      // Reset doctor when specialty changes
+      ...(field === 'specialty' && { doctor: '' }),
+    }))
+  }
+
+  const handleConfirmBooking = () => {
+    // Here you would typically send the booking data to your backend
+    console.log('Booking confirmed:', {
+      clinic: selectedOffer.clinicName,
+      scanId: selectedScanId,
+      ...bookingData,
+    })
+    
+    // Show success message and navigate
+    alert(`Консультация успешно забронирована!\n\nКлиника: ${selectedOffer.clinicName}\nСпециальность: ${specialtyNames[bookingData.specialty]}\nДата: ${new Date(bookingData.date).toLocaleDateString('ru-RU')}\nВремя: ${bookingData.time}`)
+    
+    handleCloseBookingModal()
+    // Optionally navigate to consultations page
+    // navigate('/patient/consultations')
   }
 
   const formatCost = (cost) => {
     return cost?.toLocaleString('ru-RU') + ' ₽'
-  }
-
-  const handleFilterChange = (field, value) => {
-    setFilters((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleOpenBooking = (clinic) => {
-    setSelectedClinic(clinic)
-    setBookingData({ specialty: '', doctor: '', date: '', time: '' })
-    setOpenBooking(true)
-  }
-
-  const handleCloseBooking = () => {
-    setOpenBooking(false)
-    setSelectedClinic(null)
-    setBookingData({ specialty: '', doctor: '', date: '', time: '' })
-  }
-
-  const handleBookingChange = (field, value) => {
-    setBookingData((prev) => ({ ...prev, [field]: value }))
-    if (field === 'specialty') {
-      setBookingData((prev) => ({ ...prev, doctor: '', date: '', time: '' }))
-    } else if (field === 'date') {
-      setBookingData((prev) => ({ ...prev, time: '' }))
-    }
-  }
-
-  const handleConfirmBooking = () => {
-    alert(
-      `Консультация забронирована!\n\nКлиника: ${selectedClinic.clinicName}\nСпециализация: ${specialtyNames[bookingData.specialty]}\nВрач: ${doctorsBySpecialty[bookingData.specialty].find((d) => d.id === bookingData.doctor)?.name}\nДата: ${new Date(bookingData.date).toLocaleDateString('ru-RU')}\nВремя: ${bookingData.time}`
-    )
-    handleCloseBooking()
-  }
-
-  const specialtyColors = {
-    therapy: 'info',
-    orthopedics: 'primary',
-    surgery: 'warning',
   }
 
   const specialtyNames = {
@@ -125,108 +196,184 @@ const PatientOffers = () => {
     surgery: 'Хирургия',
   }
 
-  const getAvailableTimeSlots = () => {
-    if (!bookingData.date) return []
-    const dateSlot = availableDates.find((d) => d.date === bookingData.date)
-    return dateSlot?.slots || []
+  const formatDate = (date) => {
+    return date.toLocaleDateString('ru-RU', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'long',
+    })
   }
 
-  const isBookingComplete =
-    bookingData.specialty &&
-    bookingData.doctor &&
-    bookingData.date &&
-    bookingData.time
+  const isBookingValid = () => {
+    return (
+      bookingData.specialty &&
+      bookingData.doctor &&
+      bookingData.date &&
+      bookingData.time
+    )
+  }
+
+  if (!selectedScan) {
+    return (
+      <Box>
+        <Alert severity="warning">
+          <Typography variant="body2">
+            Не найдено ни одного снимка. Пожалуйста, загрузите снимок для получения
+            предложений от клиник.
+          </Typography>
+        </Alert>
+      </Box>
+    )
+  }
+
+  if (!plan) {
+    return (
+      <Box>
+        <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
+          Предложения от клиник
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          На основе вашего плана лечения
+        </Typography>
+
+        {patientScans.length > 1 && (
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel>Выберите снимок</InputLabel>
+            <Select
+              value={selectedScanId}
+              label="Выберите снимок"
+              onChange={handleScanChange}
+            >
+              {patientScans.map((scan) => (
+                <MenuItem key={scan.id} value={scan.id}>
+                  {scan.id} - {scan.type} (
+                  {new Date(scan.date).toLocaleDateString('ru-RU')})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+
+        <Alert severity="info">
+          <Typography variant="body2">
+            План лечения для снимка {selectedScanId} находится в процессе
+            формирования. Предложения от клиник появятся после готовности плана.
+          </Typography>
+        </Alert>
+      </Box>
+    )
+  }
+
+  if (offers.length === 0) {
+    return (
+      <Box>
+        <Typography variant="h4" gutterBottom sx={{ mb: 1 }}>
+          Предложения от клиник
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          На основе вашего плана лечения
+        </Typography>
+
+        {patientScans.filter((s) => s.treatmentPlanId).length > 1 && (
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel>Выберите снимок</InputLabel>
+            <Select
+              value={selectedScanId}
+              label="Выберите снимок"
+              onChange={handleScanChange}
+            >
+              {patientScans
+                .filter((s) => s.treatmentPlanId)
+                .map((scan) => (
+                  <MenuItem key={scan.id} value={scan.id}>
+                    {scan.id} - {scan.type} (
+                    {new Date(scan.date).toLocaleDateString('ru-RU')})
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
+        )}
+
+        <Alert severity="info" sx={{ mb: 3 }}>
+          <Typography variant="body2">
+            Предложения от клиник для снимка {selectedScanId} пока не получены.
+            Обычно это занимает 1-2 дня.
+          </Typography>
+        </Alert>
+
+        <Button
+          variant="outlined"
+          onClick={() => navigate(`/patient/plan/${selectedScanId}`)}
+        >
+          Вернуться к плану лечения
+        </Button>
+      </Box>
+    )
+  }
 
   return (
-    <Box sx={{ width: '100%', maxWidth: '100%' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <LocalHospital sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
+    <Box>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'start',
+          mb: 3,
+        }}
+      >
         <Box>
-          <Typography variant="h4">Предложения клиник</Typography>
+          <Typography variant="h4" gutterBottom>
+            Предложения от клиник
+          </Typography>
           <Typography variant="body2" color="text.secondary">
-            Найдено {offers.length} клиник по вашему плану лечения
+            Получено {offers.length}{' '}
+            {offers.length === 1 ? 'предложение' : 'предложений'} для снимка{' '}
+            {selectedScanId}
           </Typography>
         </Box>
       </Box>
 
-      {/* Filters */}
-      <Card sx={{ mb: 3, width: '100%' }} elevation={2}>
-        <CardContent>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-            <FilterList />
-            <Typography variant="h6">Фильтры</Typography>
-          </Box>
+      {/* Scan Selector */}
+      {patientScans.filter((s) => s.treatmentPlanId).length > 1 && (
+        <FormControl fullWidth sx={{ mb: 3 }}>
+          <InputLabel>Выберите снимок</InputLabel>
+          <Select
+            value={selectedScanId}
+            label="Выберите снимок"
+            onChange={handleScanChange}
+          >
+            {patientScans
+              .filter((s) => s.treatmentPlanId)
+              .map((scan) => (
+                <MenuItem key={scan.id} value={scan.id}>
+                  {scan.id} - {scan.type} (
+                  {new Date(scan.date).toLocaleDateString('ru-RU')})
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+      )}
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel>Район</InputLabel>
-                <Select
-                  value={filters.area}
-                  label="Район"
-                  onChange={(e) => handleFilterChange('area', e.target.value)}
-                >
-                  <MenuItem value="all">Все районы</MenuItem>
-                  <MenuItem value="central">Центральный</MenuItem>
-                  <MenuItem value="north">Северный</MenuItem>
-                  <MenuItem value="south">Южный</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
+      <Alert severity="info" sx={{ mb: 3 }}>
+        <Typography variant="body2">
+          <strong>Совет:</strong> Сравните предложения по цене, расположению и рейтингу
+          клиник. Вы можете записаться на консультацию в несколько клиник для выбора
+          наилучшего варианта.
+        </Typography>
+      </Alert>
 
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel>Ценовой диапазон</InputLabel>
-                <Select
-                  value={filters.priceRange}
-                  label="Ценовой диапазон"
-                  onChange={(e) =>
-                    handleFilterChange('priceRange', e.target.value)
-                  }
-                >
-                  <MenuItem value="all">Любая цена</MenuItem>
-                  <MenuItem value="budget">До 80 000 ₽</MenuItem>
-                  <MenuItem value="medium">80 000 - 100 000 ₽</MenuItem>
-                  <MenuItem value="premium">Свыше 100 000 ₽</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <FormControl fullWidth>
-                <InputLabel>Сортировка</InputLabel>
-                <Select
-                  value={filters.sortBy}
-                  label="Сортировка"
-                  onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-                >
-                  <MenuItem value="price">По цене</MenuItem>
-                  <MenuItem value="distance">По расстоянию</MenuItem>
-                  <MenuItem value="rating">По рейтингу</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {/* Clinic Offers - Use Box with display:flex instead of Grid */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 3,
-          width: '100%',
-        }}
-      >
+      {/* Offers List - Full Width */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         {offers.map((offer) => (
           <Card
             key={offer.id}
-            elevation={3}
+            elevation={2}
             sx={{
-              width: '100%',
-              maxWidth: '100%',
-              '&:hover': { boxShadow: 6 },
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: 4,
+              },
             }}
           >
             <CardContent>
@@ -240,323 +387,256 @@ const PatientOffers = () => {
                   gap: 2,
                 }}
               >
-                <Box sx={{ flex: 1, minWidth: 0 }}>
+                <Box sx={{ flex: 1, minWidth: '300px' }}>
                   <Typography variant="h5" gutterBottom>
                     {offer.clinicName}
                   </Typography>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 2,
-                      mb: 1,
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                      }}
-                    >
-                      <LocationOn fontSize="small" color="action" />
-                      <Typography variant="body2" color="text.secondary">
-                        {offer.city}, {offer.area}
-                      </Typography>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      {offer.distance} км
-                    </Typography>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                      }}
-                    >
-                      <Rating value={offer.rating} readOnly size="small" />
-                      <Typography variant="body2" color="text.secondary">
-                        {offer.rating}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 2 }}>
-                    {offer.specialties.map((spec) => (
-                      <Chip
-                        key={spec}
-                        label={specialtyNames[spec]}
-                        size="small"
-                        color={specialtyColors[spec]}
-                      />
-                    ))}
+                  <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2, flexWrap: 'wrap' }}>
+                    <Chip
+                      icon={<LocationOn />}
+                      label={`${offer.area} • ${offer.distance} км`}
+                      size="small"
+                      variant="outlined"
+                    />
+                    <Chip icon={<Star />} label={offer.rating} size="small" color="warning" />
                   </Box>
                 </Box>
 
-                <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-                  <Typography variant="h4" color="primary.main" gutterBottom>
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="h4" color="primary" gutterBottom>
                     {formatCost(offer.totalPrice.min)} -{' '}
                     {formatCost(offer.totalPrice.max)}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    за весь план лечения
+                    Ориентировочная стоимость
                   </Typography>
                 </Box>
               </Box>
 
               <Divider sx={{ my: 2 }} />
 
-              {/* Price by Specialty */}
-              <Typography variant="subtitle2" gutterBottom>
-                Стоимость по специализациям:
-              </Typography>
-              <Grid container spacing={2} sx={{ mb: 2 }}>
-                {Object.entries(offer.priceBySpecialty).map(
-                  ([specialty, price]) => (
-                    <Grid item xs={12} md={4} key={specialty}>
-                      <Card variant="outlined" sx={{ height: '100%' }}>
-                        <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                          <Typography variant="caption" color="text.secondary">
-                            {specialtyNames[specialty]}
-                          </Typography>
-                          <Typography variant="h6">
-                            {formatCost(price.min)} - {formatCost(price.max)}
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  )
-                )}
-              </Grid>
-
-              {/* Special Offers */}
-              {(offer.discount || offer.installment || offer.promoComment) && (
-                <Box sx={{ mb: 2 }}>
-                  <List dense>
-                    {offer.discount && (
-                      <ListItem>
-                        <Discount color="success" sx={{ mr: 1 }} />
-                        <ListItemText primary={offer.discount} />
-                      </ListItem>
-                    )}
-                    {offer.installment && (
-                      <ListItem>
-                        <CreditCard color="info" sx={{ mr: 1 }} />
-                        <ListItemText primary={offer.installment} />
-                      </ListItem>
-                    )}
-                    {offer.promoComment && (
-                      <ListItem>
-                        <Star color="warning" sx={{ mr: 1 }} />
-                        <ListItemText primary={offer.promoComment} />
-                      </ListItem>
-                    )}
-                  </List>
-                </Box>
-              )}
-
-              <Box sx={{ display: 'flex', gap: 2, width: '100%' }}>
-                <Button
-                  variant="contained"
-                  sx={{ flex: 1 }}
-                  onClick={() => handleOpenBooking(offer)}
+              {/* Price breakdown by specialty */}
+              <Box sx={{ mb: 2 }}>
+                <Typography variant="subtitle2" gutterBottom sx={{ mb: 1 }}>
+                  Стоимость по специальностям:
+                </Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 0.5,
+                  }}
                 >
-                  Записаться на консультацию
-                </Button>
-                <Button variant="outlined" sx={{ flex: 1 }}>
-                  Подробнее о клинике
-                </Button>
+                  {Object.entries(offer.priceBySpecialty).map(([specialty, price]) => (
+                    <Box
+                      key={specialty}
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        py: 0.5,
+                        px: 2,
+                        bgcolor: 'background.default',
+                        borderRadius: 1,
+                      }}
+                    >
+                      <Typography variant="body2">{specialtyNames[specialty]}:</Typography>
+                      <Typography variant="body2" fontWeight="medium">
+                        {formatCost(price.min)} - {formatCost(price.max)}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
               </Box>
+
+              <Divider sx={{ my: 2 }} />
+
+              {/* Benefits */}
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" gutterBottom sx={{ mb: 1 }}>
+                  Преимущества:
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  {offer.discount && (
+                    <Chip
+                      icon={<AttachMoney />}
+                      label={offer.discount}
+                      color="success"
+                      size="small"
+                    />
+                  )}
+                  {offer.installment && (
+                    <Chip
+                      icon={<Schedule />}
+                      label={offer.installment}
+                      color="info"
+                      size="small"
+                    />
+                  )}
+                  {offer.promoComment && (
+                    <Chip
+                      icon={<CheckCircle />}
+                      label={offer.promoComment}
+                      color="primary"
+                      size="small"
+                    />
+                  )}
+                </Box>
+              </Box>
+
+              <Button
+                variant="contained"
+                fullWidth
+                size="large"
+                startIcon={<LocalHospital />}
+                onClick={() => handleOpenBookingModal(offer)}
+              >
+                Записаться на консультацию в {offer.clinicName}
+              </Button>
             </CardContent>
           </Card>
         ))}
       </Box>
 
-      <Alert severity="info" sx={{ mt: 3, width: '100%' }}>
-        <Typography variant="body2">
-          <strong>Совет:</strong> Рекомендуем посетить консультации в 2-3
-          клиниках для сравнения предложений и выбора оптимального варианта.
-        </Typography>
-      </Alert>
+      <Box sx={{ mt: 3 }}>
+        <Button
+          variant="outlined"
+          onClick={() => navigate(`/patient/plan/${selectedScanId}`)}
+        >
+          Вернуться к плану лечения
+        </Button>
+      </Box>
 
-      {/* Booking Dialog */}
+      {/* Booking Modal */}
       <Dialog
-        open={openBooking}
-        onClose={handleCloseBooking}
-        maxWidth="md"
+        open={openBookingModal}
+        onClose={handleCloseBookingModal}
+        maxWidth="sm"
         fullWidth
       >
         <DialogTitle>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <CalendarMonth color="primary" />
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
             <Box>
               <Typography variant="h6">Запись на консультацию</Typography>
-              {selectedClinic && (
+              {selectedOffer && (
                 <Typography variant="body2" color="text.secondary">
-                  {selectedClinic.clinicName}
+                  {selectedOffer.clinicName}
                 </Typography>
               )}
             </Box>
+            <IconButton onClick={handleCloseBookingModal}>
+              <Close />
+            </IconButton>
           </Box>
         </DialogTitle>
 
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 2 }}>
-            {/* Step 1: Choose Specialty */}
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                <MedicalServices color="primary" />
-                <Typography variant="h6">1. Выберите специализацию</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                {selectedClinic?.specialties.map((spec) => (
-                  <Chip
-                    key={spec}
-                    label={specialtyNames[spec]}
-                    clickable
-                    color={bookingData.specialty === spec ? specialtyColors[spec] : 'default'}
-                    onClick={() => handleBookingChange('specialty', spec)}
-                  />
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 1 }}>
+            {/* Specialty Selection */}
+            <FormControl fullWidth>
+              <InputLabel>Специальность</InputLabel>
+              <Select
+                value={bookingData.specialty}
+                label="Специальность"
+                onChange={(e) => handleBookingChange('specialty', e.target.value)}
+                startAdornment={<Person sx={{ mr: 1, color: 'action.active' }} />}
+              >
+                {selectedOffer?.specialties.map((specialty) => (
+                  <MenuItem key={specialty} value={specialty}>
+                    {specialtyNames[specialty]}
+                  </MenuItem>
                 ))}
-              </Box>
-            </Box>
+              </Select>
+            </FormControl>
 
-            {/* Step 2: Choose Doctor */}
-            {bookingData.specialty && (
-              <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <Person color="primary" />
-                  <Typography variant="h6">2. Выберите врача</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {doctorsBySpecialty[bookingData.specialty]?.map((doctor) => (
-                    <Box
-                      key={doctor.id}
-                      onClick={() => handleBookingChange('doctor', doctor.id)}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 2,
-                        p: 2,
-                        borderRadius: 1,
-                        border: 1,
-                        borderColor: bookingData.doctor === doctor.id ? 'primary.main' : 'divider',
-                        bgcolor: bookingData.doctor === doctor.id ? 'primary.main' : 'transparent',
-                        color: bookingData.doctor === doctor.id ? 'primary.contrastText' : 'text.primary',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        '&:hover': {
-                          bgcolor: bookingData.doctor === doctor.id ? 'primary.dark' : 'action.hover',
-                        },
-                      }}
-                    >
-                      <Avatar
-                        sx={{
-                          bgcolor: bookingData.doctor === doctor.id ? 'primary.contrastText' : 'primary.main',
-                          color: bookingData.doctor === doctor.id ? 'primary.main' : 'primary.contrastText',
-                        }}
-                      >
-                        {doctor.name.charAt(0)}
-                      </Avatar>
-                      <Box sx={{ flex: 1 }}>
-                        <Typography variant="body1" fontWeight="medium">
-                          {doctor.name}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            color: bookingData.doctor === doctor.id ? 'inherit' : 'text.secondary',
-                            opacity: bookingData.doctor === doctor.id ? 0.9 : 1,
-                          }}
-                        >
-                          Стаж: {doctor.experience} • Рейтинг: ★ {doctor.rating}
+            {/* Doctor Selection */}
+            <FormControl fullWidth disabled={!bookingData.specialty}>
+              <InputLabel>Врач</InputLabel>
+              <Select
+                value={bookingData.doctor}
+                label="Врач"
+                onChange={(e) => handleBookingChange('doctor', e.target.value)}
+              >
+                {bookingData.specialty &&
+                  doctorsBySpecialty[bookingData.specialty]?.map((doctor) => (
+                    <MenuItem key={doctor.id} value={doctor.id}>
+                      <Box>
+                        <Typography variant="body2">{doctor.name}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          Стаж: {doctor.experience}
                         </Typography>
                       </Box>
-                    </Box>
+                    </MenuItem>
                   ))}
-                </Box>
-              </Box>
-            )}
+              </Select>
+            </FormControl>
 
-            {/* Step 3: Choose Date */}
-            {bookingData.doctor && (
-              <Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                  <CalendarMonth color="primary" />
-                  <Typography variant="h6">3. Выберите дату</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                  {availableDates.map((dateObj) => (
-                    <Box
-                      key={dateObj.date}
-                      onClick={() => handleBookingChange('date', dateObj.date)}
-                      sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        p: 2,
-                        borderRadius: 1,
-                        border: 1,
-                        borderColor: bookingData.date === dateObj.date ? 'primary.main' : 'divider',
-                        bgcolor: bookingData.date === dateObj.date ? 'primary.main' : 'transparent',
-                        color: bookingData.date === dateObj.date ? 'primary.contrastText' : 'text.primary',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        '&:hover': {
-                          bgcolor: bookingData.date === dateObj.date ? 'primary.dark' : 'action.hover',
-                        },
-                      }}
-                    >
-                      <Typography variant="body1" fontWeight="medium">
-                        {new Date(dateObj.date).toLocaleDateString('ru-RU', {
-                          weekday: 'long',
-                          day: 'numeric',
-                          month: 'long',
-                        })}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: bookingData.date === dateObj.date ? 'inherit' : 'text.secondary',
-                          opacity: bookingData.date === dateObj.date ? 0.9 : 1,
-                        }}
-                      >
-                        Доступно слотов: {dateObj.slots.length}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            )}
+            {/* Date Selection */}
+            <FormControl fullWidth disabled={!bookingData.doctor}>
+              <InputLabel>Дата консультации</InputLabel>
+              <Select
+                value={bookingData.date}
+                label="Дата консультации"
+                onChange={(e) => handleBookingChange('date', e.target.value)}
+                startAdornment={<CalendarToday sx={{ mr: 1, color: 'action.active' }} />}
+              >
+                {availableDates.map((date, index) => (
+                  <MenuItem key={index} value={date.toISOString()}>
+                    {formatDate(date)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-            {/* Step 4: Choose Time */}
-            {bookingData.date && (
-              <Box>
-                <Typography variant="h6" gutterBottom>
-                  4. Выберите время
+            {/* Time Selection */}
+            <FormControl fullWidth disabled={!bookingData.date}>
+              <InputLabel>Время</InputLabel>
+              <Select
+                value={bookingData.time}
+                label="Время"
+                onChange={(e) => handleBookingChange('time', e.target.value)}
+                startAdornment={<AccessTime sx={{ mr: 1, color: 'action.active' }} />}
+              >
+                {availableTimes.map((time) => (
+                  <MenuItem key={time} value={time}>
+                    {time}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {/* Summary */}
+            {isBookingValid() && (
+              <Alert severity="info">
+                <Typography variant="body2" gutterBottom>
+                  <strong>Ваша запись:</strong>
                 </Typography>
-                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {getAvailableTimeSlots().map((time) => (
-                    <Chip
-                      key={time}
-                      label={time}
-                      clickable
-                      color={bookingData.time === time ? 'primary' : 'default'}
-                      onClick={() => handleBookingChange('time', time)}
-                    />
-                  ))}
-                </Box>
-              </Box>
+                <Typography variant="body2">
+                  Специальность: {specialtyNames[bookingData.specialty]}
+                  <br />
+                  Дата: {new Date(bookingData.date).toLocaleDateString('ru-RU')}
+                  <br />
+                  Время: {bookingData.time}
+                </Typography>
+              </Alert>
             )}
           </Box>
         </DialogContent>
 
-        <DialogActions>
-          <Button onClick={handleCloseBooking}>Отмена</Button>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button onClick={handleCloseBookingModal} variant="outlined">
+            Отмена
+          </Button>
           <Button
-            variant="contained"
             onClick={handleConfirmBooking}
-            disabled={!isBookingComplete}
+            variant="contained"
+            disabled={!isBookingValid()}
+            startIcon={<CheckCircle />}
           >
             Подтвердить запись
           </Button>

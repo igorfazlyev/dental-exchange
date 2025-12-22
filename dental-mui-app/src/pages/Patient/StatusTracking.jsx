@@ -1,157 +1,334 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useScan } from '../../contexts/ScanContext'
 import {
   Box,
   Card,
   CardContent,
   Typography,
-  Chip,
   Stepper,
   Step,
   StepLabel,
   StepContent,
-  Paper,
-  Alert,
+  Chip,
+  Button,
   LinearProgress,
+  Alert,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Breadcrumbs,
+  Divider,
+  Grid,
 } from '@mui/material'
 import {
-  CheckBox,
+  Timeline,
   CheckCircle,
   Schedule,
-  RadioButtonUnchecked,
+  Image as ImageIcon,
+  Assignment,
+  LocalHospital,
+  CalendarMonth,
+  EmojiEvents,
+  NavigateNext,
+  Pending,
 } from '@mui/icons-material'
-import { treatmentStages } from '../../data/mockData'
+import { treatmentTracking, patientScans } from '../../data/mockData'
 
 const PatientStatusTracking = () => {
-  const [stages] = useState(treatmentStages)
+  const { scanId } = useParams()
+  const navigate = useNavigate()
+  const { activeScanId, setActiveScanId } = useScan()
+  const [selectedScanId, setSelectedScanId] = useState(
+    scanId || activeScanId || patientScans[0]?.id
+  )
+  const [selectedScan, setSelectedScan] = useState(null)
+  const [tracking, setTracking] = useState(null)
 
-  const getStepIcon = (status) => {
-    switch (status) {
-      case 'done':
-        return <CheckCircle color="success" />
-      case 'in_progress':
-        return <Schedule color="primary" />
+  useEffect(() => {
+    if (selectedScanId) {
+      setActiveScanId(selectedScanId)
+      const scan = patientScans.find((s) => s.id === selectedScanId)
+      setSelectedScan(scan)
+
+      if (treatmentTracking[selectedScanId]) {
+        setTracking(treatmentTracking[selectedScanId])
+      } else {
+        setTracking(null)
+      }
+    }
+  }, [selectedScanId, setActiveScanId])
+
+  const handleScanChange = (event) => {
+    const newScanId = event.target.value
+    setSelectedScanId(newScanId)
+    navigate(`/patient/status/${newScanId}`)
+  }
+
+  const getStepIcon = (type, status) => {
+    const iconProps = {
+      sx: {
+        fontSize: 28,
+        color:
+          status === 'completed'
+            ? 'success.main'
+            : status === 'in_progress'
+            ? 'primary.main'
+            : 'text.secondary',
+      },
+    }
+
+    switch (type) {
+      case 'scan':
+        return <ImageIcon {...iconProps} />
+      case 'plan':
+      case 'analysis':
+        return <Assignment {...iconProps} />
+      case 'offers':
+        return <LocalHospital {...iconProps} />
+      case 'consultation':
+        return <CalendarMonth {...iconProps} />
+      case 'treatment':
+        return <Timeline {...iconProps} />
+      case 'completion':
+        return <EmojiEvents {...iconProps} />
       default:
-        return <RadioButtonUnchecked color="disabled" />
+        return <CheckCircle {...iconProps} />
     }
   }
 
-  const getStatusColor = (status) => {
+  const getStatusChip = (status) => {
     switch (status) {
-      case 'done':
-        return 'success'
+      case 'completed':
+        return <Chip label="Завершено" size="small" color="success" icon={<CheckCircle />} />
       case 'in_progress':
-        return 'primary'
+        return <Chip label="В процессе" size="small" color="primary" icon={<Schedule />} />
+      case 'upcoming':
+        return <Chip label="Запланировано" size="small" color="info" icon={<Schedule />} />
+      case 'pending':
+        return <Chip label="Ожидается" size="small" color="default" icon={<Pending />} />
       default:
-        return 'default'
+        return null
     }
   }
 
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'done':
-        return 'Завершено'
-      case 'in_progress':
-        return 'В процессе'
-      default:
-        return 'Не начато'
+  const getActiveStep = () => {
+    if (!tracking) return 0
+    const timeline = tracking.timeline
+    for (let i = timeline.length - 1; i >= 0; i--) {
+      if (timeline[i].status === 'completed' || timeline[i].status === 'in_progress') {
+        return i
+      }
     }
+    return 0
   }
 
-  const completedStages = stages.filter(s => s.status === 'done').length
-  const totalStages = stages.length
-  const progress = (completedStages / totalStages) * 100
-
-  const specialtyNames = {
-    therapy: 'Терапия',
-    orthopedics: 'Ортопедия',
-    surgery: 'Хирургия',
+  if (!selectedScan) {
+    return (
+      <Box>
+        <Alert severity="warning">
+          <Typography variant="body2">
+            Не найдено ни одного снимка. Пожалуйста, загрузите снимок для отслеживания лечения.
+          </Typography>
+        </Alert>
+      </Box>
+    )
   }
+
+  if (!tracking) {
+    return (
+      <Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+          <Timeline sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
+          <Box>
+            <Typography variant="h4">Статус лечения</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Отслеживание прогресса вашего лечения
+            </Typography>
+          </Box>
+        </Box>
+
+        {patientScans.length > 1 && (
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel>Выберите снимок</InputLabel>
+            <Select
+              value={selectedScanId}
+              label="Выберите снимок"
+              onChange={handleScanChange}
+            >
+              {patientScans.map((scan) => (
+                <MenuItem key={scan.id} value={scan.id}>
+                  {scan.id} - {scan.type} ({new Date(scan.date).toLocaleDateString('ru-RU')})
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+
+        <Alert severity="info">
+          <Typography variant="body2">
+            Информация о лечении для снимка {selectedScanId} пока недоступна. Данные появятся после начала лечения.
+          </Typography>
+        </Alert>
+      </Box>
+    )
+  }
+
+  const activeStep = getActiveStep()
 
   return (
     <Box>
+      {/* Breadcrumbs */}
+      <Breadcrumbs separator={<NavigateNext fontSize="small" />} sx={{ mb: 2 }}>
+        <Link to="/patient/scans" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Typography color="text.secondary" sx={{ '&:hover': { textDecoration: 'underline' } }}>
+            Мои снимки
+          </Typography>
+        </Link>
+        <Typography color="text.primary" fontWeight="medium">
+          {selectedScan.id}
+        </Typography>
+        <Typography color="text.primary" fontWeight="medium">
+          Статус лечения
+        </Typography>
+      </Breadcrumbs>
+
+      {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <CheckBox sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
-        <Box>
+        <Timeline sx={{ fontSize: 40, mr: 2, color: 'primary.main' }} />
+        <Box sx={{ flex: 1 }}>
           <Typography variant="h4">Статус лечения</Typography>
           <Typography variant="body2" color="text.secondary">
-            Отслеживайте прогресс выполнения плана лечения
+            Снимок {selectedScan.id} от {new Date(selectedScan.date).toLocaleDateString('ru-RU')}
           </Typography>
         </Box>
       </Box>
 
-      {/* Progress Overview */}
+      {/* Scan Selector */}
+      {patientScans.length > 1 && (
+        <FormControl fullWidth sx={{ mb: 3 }}>
+          <InputLabel>Выберите снимок</InputLabel>
+          <Select value={selectedScanId} label="Выберите снимок" onChange={handleScanChange}>
+            {patientScans.map((scan) => (
+              <MenuItem key={scan.id} value={scan.id}>
+                {scan.id} - {scan.type} ({new Date(scan.date).toLocaleDateString('ru-RU')}) -{' '}
+                {scan.treatmentStatus === 'in_progress'
+                  ? 'В процессе лечения'
+                  : scan.treatmentStatus === 'pending_consultation'
+                  ? 'Ожидание консультации'
+                  : 'Анализ'}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )}
+
+      {/* Progress Overview Card */}
       <Card sx={{ mb: 3 }} elevation={2}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Общий прогресс
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-            <Box sx={{ flex: 1 }}>
-              <LinearProgress 
-                variant="determinate" 
-                value={progress} 
-                sx={{ height: 10, borderRadius: 5 }}
-              />
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Текущий этап
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {tracking.currentPhase}
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Дата начала
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {tracking.startDate ? new Date(tracking.startDate).toLocaleDateString('ru-RU') : 'Не начато'}
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Box>
+                <Typography variant="caption" color="text.secondary">
+                  Ожидаемое завершение
+                </Typography>
+                <Typography variant="h6" gutterBottom>
+                  {tracking.estimatedCompletion
+                    ? new Date(tracking.estimatedCompletion).toLocaleDateString('ru-RU')
+                    : 'Уточняется'}
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                Общий прогресс лечения
+              </Typography>
+              <Typography variant="body2" fontWeight="medium">
+                {tracking.overallProgress}%
+              </Typography>
             </Box>
-            <Typography variant="h6" color="primary">
-              {Math.round(progress)}%
-            </Typography>
+            <LinearProgress
+              variant="determinate"
+              value={tracking.overallProgress}
+              sx={{ height: 10, borderRadius: 1 }}
+            />
           </Box>
-          <Typography variant="body2" color="text.secondary">
-            Завершено {completedStages} из {totalStages} этапов
-          </Typography>
         </CardContent>
       </Card>
 
-      {/* Treatment Stages */}
+      {/* Timeline */}
       <Card elevation={2}>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Этапы лечения
+          <Typography variant="h6" gutterBottom sx={{ mb: 3 }}>
+            Хронология лечения
           </Typography>
 
-          <Stepper orientation="vertical" activeStep={stages.findIndex(s => s.status === 'in_progress')}>
-            {stages.map((stage, index) => (
-              <Step key={stage.id} active={true} completed={stage.status === 'done'}>
+          <Stepper activeStep={activeStep} orientation="vertical">
+            {tracking.timeline.map((event, index) => (
+              <Step key={index} expanded>
                 <StepLabel
-                  StepIconComponent={() => getStepIcon(stage.status)}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                    <Typography variant="subtitle1" fontWeight="medium">
-                      {stage.name}
+                  StepIconComponent={() => getStepIcon(event.type, event.status)}
+                  optional={
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(event.date).toLocaleDateString('ru-RU', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                      })}
                     </Typography>
-                    <Chip
-                      label={getStatusLabel(stage.status)}
-                      size="small"
-                      color={getStatusColor(stage.status)}
-                    />
-                    {stage.specialty && (
-                      <Chip
-                        label={specialtyNames[stage.specialty]}
-                        size="small"
-                        variant="outlined"
-                      />
-                    )}
+                  }
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography variant="body1" fontWeight="medium">
+                      {event.title}
+                    </Typography>
+                    {getStatusChip(event.status)}
                   </Box>
                 </StepLabel>
                 <StepContent>
-                  <Paper variant="outlined" sx={{ p: 2, mt: 1 }}>
-                    {stage.status === 'done' && stage.completedAt && (
-                      <Typography variant="body2" color="text.secondary">
-                        ✅ Завершено: {new Date(stage.completedAt).toLocaleDateString('ru-RU')}
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {event.description}
+                  </Typography>
+                  {event.status === 'in_progress' && (
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      <Typography variant="body2">
+                        Этот этап сейчас в процессе выполнения
                       </Typography>
-                    )}
-                    {stage.status === 'in_progress' && (
-                      <Alert severity="info" sx={{ mt: 1 }}>
-                        Этап в процессе выполнения. Следующий визит запланирован.
-                      </Alert>
-                    )}
-                    {stage.status === 'not_started' && (
-                      <Typography variant="body2" color="text.secondary">
-                        Этап еще не начат. Будет доступен после завершения предыдущих этапов.
+                    </Alert>
+                  )}
+                  {event.status === 'upcoming' && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                      <Typography variant="body2">
+                        Запланировано на {new Date(event.date).toLocaleDateString('ru-RU')}
                       </Typography>
-                    )}
-                  </Paper>
+                    </Alert>
+                  )}
                 </StepContent>
               </Step>
             ))}
@@ -159,12 +336,46 @@ const PatientStatusTracking = () => {
         </CardContent>
       </Card>
 
-      <Alert severity="success" sx={{ mt: 3 }}>
-        <Typography variant="body2">
-          <strong>Уведомления включены!</strong> Вы будете получать push-уведомления при изменении 
-          статуса этапов лечения.
-        </Typography>
-      </Alert>
+      {/* Quick Actions */}
+      <Card sx={{ mt: 3 }} elevation={2}>
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Быстрые действия
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', mt: 2 }}>
+            <Button
+              variant="outlined"
+              startIcon={<ImageIcon />}
+              onClick={() => navigate('/patient/scans')}
+            >
+              Посмотреть снимок
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Assignment />}
+              onClick={() => navigate(`/patient/plan/${selectedScanId}`)}
+            >
+              План лечения
+            </Button>
+            {selectedScan.hasOffers && (
+              <Button
+                variant="outlined"
+                startIcon={<LocalHospital />}
+                onClick={() => navigate(`/patient/offers/${selectedScanId}`)}
+              >
+                Предложения клиник
+              </Button>
+            )}
+            <Button
+              variant="outlined"
+              startIcon={<CalendarMonth />}
+              onClick={() => navigate('/patient/consultations')}
+            >
+              Мои консультации
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
     </Box>
   )
 }
