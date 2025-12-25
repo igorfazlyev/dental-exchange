@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   Box,
   Card,
@@ -54,6 +54,9 @@ const PatientOffers = () => {
     time: '',
   })
 
+  // Ref for time slots section
+  const timeSlotsRef = useRef(null)
+
   // Mock available slots data
   const availableDates = [
     { date: '2025-12-23', slots: ['09:00', '11:00', '14:00', '16:00'] },
@@ -76,6 +79,18 @@ const PatientOffers = () => {
       { id: 6, name: 'Морозов Владимир Александрович', experience: '16 лет', rating: 4.8 },
     ],
   }
+
+  // Auto-scroll to time slots when date is selected
+  useEffect(() => {
+    if (bookingData.date && timeSlotsRef.current) {
+      setTimeout(() => {
+        timeSlotsRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      }, 100)
+    }
+  }, [bookingData.date])
 
   const formatCost = (cost) => {
     return cost?.toLocaleString('ru-RU') + ' ₽'
@@ -531,7 +546,7 @@ const PatientOffers = () => {
 
             {/* Step 4: Choose Time */}
             {bookingData.date && (
-              <Box>
+              <Box ref={timeSlotsRef}>
                 <Typography variant="h6" gutterBottom>
                   4. Выберите время
                 </Typography>
