@@ -4,10 +4,518 @@ import { mockClinics } from '../api/mockData/clinics';
 import { mockOffers } from '../api/mockData/offers';
 import { SPECIALIZATIONS } from '../api/mockData/specializations';
 
+
 // In-memory data store (simulates database)
 let patients = [...mockPatients];
 let clinics = [...mockClinics];
 let offers = [...mockOffers];
+
+// Mock incoming plans data
+// Update mockIncomingPlans in handlers.js:
+
+const mockIncomingPlans = [
+  {
+    id: 101,
+    patientId: 1,
+    patientAge: 32,
+    patientGender: 'male',
+    createdDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    specializations: [
+      {
+        type: 'therapy',
+        procedures: [
+          { 
+            tooth: 16, 
+            procedure: 'Лечение кариеса', 
+            estimatedPrice: { min: 5000, max: 8000 } // ✅ This is correct
+          },
+          { 
+            tooth: 26, 
+            procedure: 'Пломбирование канала', 
+            estimatedPrice: { min: 12000, max: 18000 } 
+          },
+        ],
+        totalEstimate: { min: 17000, max: 26000 }, // ✅ ADD THIS - should be object with min/max
+      },
+      {
+        type: 'hygiene',
+        procedures: [
+          { 
+            procedure: 'Профессиональная чистка', 
+            estimatedPrice: { min: 4000, max: 6000 } 
+          },
+        ],
+        totalEstimate: { min: 4000, max: 6000 }, // ✅ ADD THIS
+      },
+    ],
+    selectedSpecializations: ['therapy', 'hygiene'],
+    totalEstimate: { min: 21000, max: 32000 }, // ✅ Change from number to object
+    searchCriteria: {
+      priceRange: { min: 20000, max: 50000 },
+      districts: ['Центральный', 'Тверской'],
+      metro: ['Маяковская', 'Пушкинская'],
+    },
+    status: 'published',
+  },
+  {
+    id: 102,
+    patientId: 2,
+    patientAge: 45,
+    patientGender: 'female',
+    createdDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    specializations: [
+      {
+        type: 'orthopedics',
+        procedures: [
+          { 
+            tooth: 36, 
+            procedure: 'Коронка металлокерамическая', 
+            estimatedPrice: { min: 25000, max: 45000 } 
+          },
+          { 
+            tooth: 46, 
+            procedure: 'Коронка металлокерамическая', 
+            estimatedPrice: { min: 25000, max: 45000 } 
+          },
+        ],
+        totalEstimate: { min: 50000, max: 90000 }, // ✅ ADD THIS
+      },
+    ],
+    selectedSpecializations: ['orthopedics'],
+    totalEstimate: { min: 50000, max: 90000 }, // ✅ Change to object
+    searchCriteria: {
+      priceRange: { min: 50000, max: 100000 },
+      districts: ['Центральный', 'Пресненский'],
+      metro: ['Белорусская', 'Маяковская'],
+    },
+    status: 'published',
+  },
+  {
+    id: 103,
+    patientId: 3,
+    patientAge: 28,
+    patientGender: 'female',
+    createdDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    specializations: [
+      {
+        type: 'surgery',
+        procedures: [
+          { 
+            tooth: 38, 
+            procedure: 'Удаление зуба мудрости', 
+            estimatedPrice: { min: 3000, max: 8000 } 
+          },
+        ],
+        totalEstimate: { min: 3000, max: 8000 }, // ✅ ADD THIS
+      },
+      {
+        type: 'therapy',
+        procedures: [
+          { 
+            tooth: 17, 
+            procedure: 'Лечение пульпита', 
+            estimatedPrice: { min: 12000, max: 18000 } 
+          },
+        ],
+        totalEstimate: { min: 12000, max: 18000 }, // ✅ ADD THIS
+      },
+    ],
+    selectedSpecializations: ['surgery', 'therapy'],
+    totalEstimate: { min: 15000, max: 26000 }, // ✅ Change to object
+    searchCriteria: {
+      priceRange: { min: 15000, max: 30000 },
+      districts: ['Центральный', 'Хамовники'],
+      metro: ['Фрунзенская', 'Пушкинская'],
+    },
+    status: 'published',
+  },
+  {
+    id: 104,
+    patientId: 4,
+    patientAge: 55,
+    patientGender: 'male',
+    createdDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    specializations: [
+      {
+        type: 'periodontics',
+        procedures: [
+          { 
+            procedure: 'Лечение пародонтита', 
+            estimatedPrice: { min: 10000, max: 20000 } 
+          },
+        ],
+        totalEstimate: { min: 10000, max: 20000 }, // ✅ ADD THIS
+      },
+      {
+        type: 'hygiene',
+        procedures: [
+          { 
+            procedure: 'Профессиональная чистка', 
+            estimatedPrice: { min: 4000, max: 6000 } 
+          },
+        ],
+        totalEstimate: { min: 4000, max: 6000 }, // ✅ ADD THIS
+      },
+    ],
+    selectedSpecializations: ['periodontics', 'hygiene'],
+    totalEstimate: { min: 14000, max: 26000 }, // ✅ Change to object
+    searchCriteria: {
+      priceRange: { min: 20000, max: 40000 },
+      districts: ['Хамовники'],
+      metro: ['Фрунзенская'],
+    },
+    status: 'published',
+  },
+  {
+    id: 105,
+    patientId: 5,
+    patientAge: 38,
+    patientGender: 'male',
+    createdDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+    specializations: [
+      {
+        type: 'orthopedics',
+        procedures: [
+          { 
+            tooth: 14, 
+            procedure: 'Имплант + коронка', 
+            estimatedPrice: { min: 80000, max: 120000 } 
+          },
+        ],
+        totalEstimate: { min: 80000, max: 120000 }, // ✅ ADD THIS
+      },
+      {
+        type: 'therapy',
+        procedures: [
+          { 
+            tooth: 15, 
+            procedure: 'Лечение кариеса', 
+            estimatedPrice: { min: 5000, max: 8000 } 
+          },
+          { 
+            tooth: 25, 
+            procedure: 'Лечение кариеса', 
+            estimatedPrice: { min: 5000, max: 8000 } 
+          },
+        ],
+        totalEstimate: { min: 10000, max: 16000 }, // ✅ ADD THIS
+      },
+    ],
+    selectedSpecializations: ['orthopedics', 'therapy'],
+    totalEstimate: { min: 90000, max: 136000 }, // ✅ Change to object
+    searchCriteria: {
+      priceRange: { min: 80000, max: 150000 },
+      districts: ['Центральный', 'Тверской', 'Пресненский'],
+      metro: ['Маяковская', 'Белорусская', 'Пушкинская'],
+    },
+    status: 'published',
+  },
+];
+
+
+// Mock leads data
+// In handlers.js - Replace the mockLeads array with this:
+
+const mockLeads = [
+  {
+    id: 1001,
+    patient: {
+      id: 1,
+      name: 'Иван П.',
+      phone: '+7 (999) 123-45-67',
+      email: 'patient@demo.com',
+      age: 32,
+    },
+    treatmentPlan: {
+      id: 101,
+      specializations: [
+        {
+          type: 'therapy',
+          procedures: [
+            { tooth: 16, procedure: 'Лечение кариеса', estimatedPrice: { min: 5000, max: 8000 } },
+            { tooth: 26, procedure: 'Пломбирование канала', estimatedPrice: { min: 12000, max: 18000 } },
+          ],
+        },
+        {
+          type: 'hygiene',
+          procedures: [
+            { procedure: 'Профессиональная чистка', estimatedPrice: { min: 4000, max: 6000 } },
+          ],
+        },
+      ],
+      selectedSpecializations: ['therapy', 'hygiene'],
+      totalEstimate: 26500,
+    },
+    offer: {
+      id: 2001,
+      totalPrice: 26500,
+      discountedPrice: 24000,
+      discount: 10,
+    },
+    appointment: {
+      id: 3001,
+      status: 'new',
+      createdDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      notes: '',
+    },
+    createdDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'new',
+  },
+  {
+    id: 1002,
+    patient: {
+      id: 2,
+      name: 'Мария С.',
+      phone: '+7 (999) 234-56-78',
+      email: 'maria@example.com',
+      age: 45,
+    },
+    treatmentPlan: {
+      id: 102,
+      specializations: [
+        {
+          type: 'orthopedics',
+          procedures: [
+            { tooth: 36, procedure: 'Коронка металлокерамическая', estimatedPrice: { min: 25000, max: 45000 } },
+            { tooth: 46, procedure: 'Коронка металлокерамическая', estimatedPrice: { min: 25000, max: 45000 } },
+          ],
+        },
+      ],
+      selectedSpecializations: ['orthopedics'],
+      totalEstimate: 70000,
+    },
+    offer: {
+      id: 2002,
+      totalPrice: 70000,
+      discountedPrice: 63000,
+      discount: 10,
+    },
+    appointment: {
+      id: 3002,
+      status: 'contacted',
+      createdDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      notes: 'Связались, интересуется установкой коронок. Записана на консультацию 27.12.',
+      lastContactDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    createdDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'contacted',
+  },
+  {
+    id: 1003,
+    patient: {
+      id: 3,
+      name: 'Анна К.',
+      phone: '+7 (999) 345-67-89',
+      email: 'anna@example.com',
+      age: 28,
+    },
+    treatmentPlan: {
+      id: 103,
+      specializations: [
+        {
+          type: 'surgery',
+          procedures: [
+            { tooth: 38, procedure: 'Удаление зуба мудрости', estimatedPrice: { min: 3000, max: 8000 } },
+          ],
+        },
+        {
+          type: 'therapy',
+          procedures: [
+            { tooth: 17, procedure: 'Лечение пульпита', estimatedPrice: { min: 12000, max: 18000 } },
+          ],
+        },
+      ],
+      selectedSpecializations: ['surgery', 'therapy'],
+      totalEstimate: 20000,
+    },
+    offer: {
+      id: 2003,
+      totalPrice: 20000,
+      discountedPrice: 18000,
+      discount: 10,
+    },
+    appointment: {
+      id: 3003,
+      status: 'new',
+      createdDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      notes: '',
+    },
+    createdDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'new',
+  },
+  {
+    id: 1004,
+    patient: {
+      id: 6,
+      name: 'Сергей Д.',
+      phone: '+7 (999) 456-78-90',
+      email: 'sergey@example.com',
+      age: 42,
+    },
+    treatmentPlan: {
+      id: 98,
+      specializations: [
+        {
+          type: 'therapy',
+          procedures: [
+            { tooth: 16, procedure: 'Лечение кариеса', estimatedPrice: { min: 5000, max: 8000 } },
+          ],
+        },
+      ],
+      selectedSpecializations: ['therapy'],
+      totalEstimate: 15000,
+    },
+    offer: {
+      id: 2004,
+      totalPrice: 15000,
+      discountedPrice: 13500,
+      discount: 10,
+    },
+    appointment: {
+      id: 3004,
+      status: 'scheduled',
+      createdDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      notes: 'Записан на 26.12 в 14:00. Лечение кариеса зуба 16.',
+      lastContactDate: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+      appointmentDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    createdDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'scheduled',
+  },
+  {
+    id: 1005,
+    patient: {
+      id: 7,
+      name: 'Елена В.',
+      phone: '+7 (999) 567-89-01',
+      email: 'elena@example.com',
+      age: 35,
+    },
+    treatmentPlan: {
+      id: 95,
+      specializations: [
+        {
+          type: 'orthopedics',
+          procedures: [
+            { tooth: 14, procedure: 'Имплант + коронка', estimatedPrice: { min: 80000, max: 120000 } },
+          ],
+        },
+        {
+          type: 'therapy',
+          procedures: [
+            { tooth: 15, procedure: 'Лечение кариеса', estimatedPrice: { min: 5000, max: 8000 } },
+            { tooth: 25, procedure: 'Лечение кариеса', estimatedPrice: { min: 5000, max: 8000 } },
+          ],
+        },
+      ],
+      selectedSpecializations: ['orthopedics', 'therapy'],
+      totalEstimate: 85000,
+    },
+    offer: {
+      id: 2005,
+      totalPrice: 85000,
+      discountedPrice: 76500,
+      discount: 10,
+    },
+    appointment: {
+      id: 3005,
+      status: 'in_treatment',
+      createdDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      notes: 'Начато лечение. Завершена терапия, идёт подготовка к протезированию.',
+      lastContactDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      appointmentDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+      treatmentStartDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    createdDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'in_treatment',
+  },
+  {
+    id: 1006,
+    patient: {
+      id: 8,
+      name: 'Дмитрий Л.',
+      phone: '+7 (999) 678-90-12',
+      email: 'dmitry@example.com',
+      age: 50,
+    },
+    treatmentPlan: {
+      id: 92,
+      specializations: [
+        {
+          type: 'hygiene',
+          procedures: [
+            { procedure: 'Профессиональная чистка', estimatedPrice: { min: 4000, max: 6000 } },
+          ],
+        },
+      ],
+      selectedSpecializations: ['hygiene'],
+      totalEstimate: 5000,
+    },
+    offer: {
+      id: 2006,
+      totalPrice: 5000,
+      discountedPrice: 4500,
+      discount: 10,
+    },
+    appointment: {
+      id: 3006,
+      status: 'completed',
+      createdDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+      notes: 'Лечение завершено. Профчистка выполнена. Пациент доволен.',
+      lastContactDate: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+      treatmentStartDate: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+      completionDate: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    createdDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'completed',
+  },
+  {
+    id: 1007,
+    patient: {
+      id: 9,
+      name: 'Ольга Р.',
+      phone: '+7 (999) 789-01-23',
+      email: 'olga@example.com',
+      age: 29,
+    },
+    treatmentPlan: {
+      id: 89,
+      specializations: [
+        {
+          type: 'therapy',
+          procedures: [
+            { tooth: 16, procedure: 'Лечение кариеса', estimatedPrice: { min: 5000, max: 8000 } },
+          ],
+        },
+        {
+          type: 'hygiene',
+          procedures: [
+            { procedure: 'Профессиональная чистка', estimatedPrice: { min: 4000, max: 6000 } },
+          ],
+        },
+      ],
+      selectedSpecializations: ['therapy', 'hygiene'],
+      totalEstimate: 22000,
+    },
+    offer: {
+      id: 2007,
+      totalPrice: 22000,
+      discountedPrice: 19800,
+      discount: 10,
+    },
+    appointment: {
+      id: 3007,
+      status: 'rejected',
+      createdDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+      notes: 'Отказ. Выбрала другую клинику ближе к дому.',
+      lastContactDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+    },
+    createdDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'rejected',
+  },
+];
+
+
 
 export const handlers = [
   // ============= AUTH ENDPOINTS =============
@@ -34,6 +542,7 @@ export const handlers = [
       { status: 401 }
     );
   }),
+
 
   // ============= PATIENT ENDPOINTS =============
   
@@ -243,6 +752,7 @@ export const handlers = [
     return HttpResponse.json(enrichedAppointments);
   }),
 
+
   // ============= CLINIC ENDPOINTS =============
   
   // Get clinic profile
@@ -260,107 +770,360 @@ export const handlers = [
     return HttpResponse.json(clinic);
   }),
   
-  // Get incoming treatment plans (marketplace)
-  http.get('/api/clinic/:id/incoming-plans', async ({ params, request }) => {
-    await delay(500);
-    const url = new URL(request.url);
-    const specializationFilter = url.searchParams.get('specialization');
-    
-    // Find published treatment plans that match clinic's specializations
-    const clinic = clinics.find(c => c.id === Number(params.id));
-    if (!clinic) {
-      return HttpResponse.json([], { status: 200 });
-    }
-    
-    const incomingPlans = [];
-    
-    patients.forEach(patient => {
-      patient.treatmentPlans.forEach(plan => {
-        if (plan.status === 'published') {
-          // Check if plan has specializations this clinic offers
-          const hasMatchingSpec = plan.specializations.some(spec =>
-            clinic.specializations.includes(spec.type)
-          );
-          
-          if (hasMatchingSpec) {
-            incomingPlans.push({
-              id: plan.id,
-              patientId: patient.id,
-              patientAge: patient.age,
-              patientGender: patient.gender,
-              createdDate: plan.createdDate,
-              specializations: plan.specializations,
-              totalEstimate: plan.totalEstimate,
-              selectedSpecializations: plan.selectedSpecializations,
-              searchCriteria: plan.searchCriteria,
-            });
-          }
-        }
-      });
-    });
-    
-    return HttpResponse.json(incomingPlans);
-  }),
+  // Get incoming treatment plans (marketplace) - NOW WITH MOCK DATA
+// Get incoming treatment plans (marketplace)
+http.get('/api/clinic/:id/incoming-plans', async ({ params, request }) => {
+  await delay(500);
+  const url = new URL(request.url);
+  const specializationFilter = url.searchParams.get('specialization');
+  
+  // Mock incoming plans with proper structure
+  const mockIncomingPlans = [
+    {
+      id: 101,
+      patientId: 1,
+      patientAge: 32,
+      patientGender: 'male',
+      createdDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      specializations: [
+        {
+          type: 'therapy',
+          procedures: [
+            { 
+              tooth: 16, 
+              procedure: 'Лечение кариеса', 
+              estimatedPrice: { min: 5000, max: 8000 } 
+            },
+            { 
+              tooth: 26, 
+              procedure: 'Пломбирование канала', 
+              estimatedPrice: { min: 12000, max: 18000 } 
+            },
+          ],
+          totalPrice: { min: 17000, max: 26000 }, // ✅ Changed from totalEstimate to totalPrice
+        },
+        {
+          type: 'hygiene',
+          procedures: [
+            { 
+              procedure: 'Профессиональная чистка', 
+              estimatedPrice: { min: 4000, max: 6000 } 
+            },
+          ],
+          totalPrice: { min: 4000, max: 6000 }, // ✅ Changed from totalEstimate to totalPrice
+        },
+      ],
+      selectedSpecializations: ['therapy', 'hygiene'],
+      totalEstimate: { min: 21000, max: 32000 },
+      searchCriteria: {
+        priceRange: { min: 20000, max: 50000 },
+        districts: ['Центральный', 'Тверской'],
+        metro: ['Маяковская', 'Пушкинская'],
+      },
+      status: 'published',
+    },
+    {
+      id: 102,
+      patientId: 2,
+      patientAge: 45,
+      patientGender: 'female',
+      createdDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      specializations: [
+        {
+          type: 'orthopedics',
+          procedures: [
+            { 
+              tooth: 36, 
+              procedure: 'Коронка металлокерамическая', 
+              estimatedPrice: { min: 25000, max: 45000 } 
+            },
+            { 
+              tooth: 46, 
+              procedure: 'Коронка металлокерамическая', 
+              estimatedPrice: { min: 25000, max: 45000 } 
+            },
+          ],
+          totalPrice: { min: 50000, max: 90000 }, // ✅ Added totalPrice
+        },
+      ],
+      selectedSpecializations: ['orthopedics'],
+      totalEstimate: { min: 50000, max: 90000 },
+      searchCriteria: {
+        priceRange: { min: 50000, max: 100000 },
+        districts: ['Центральный', 'Пресненский'],
+        metro: ['Белорусская', 'Маяковская'],
+      },
+      status: 'published',
+    },
+    {
+      id: 103,
+      patientId: 3,
+      patientAge: 28,
+      patientGender: 'female',
+      createdDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      specializations: [
+        {
+          type: 'surgery',
+          procedures: [
+            { 
+              tooth: 38, 
+              procedure: 'Удаление зуба мудрости', 
+              estimatedPrice: { min: 3000, max: 8000 } 
+            },
+          ],
+          totalPrice: { min: 3000, max: 8000 }, // ✅ Added totalPrice
+        },
+        {
+          type: 'therapy',
+          procedures: [
+            { 
+              tooth: 17, 
+              procedure: 'Лечение пульпита', 
+              estimatedPrice: { min: 12000, max: 18000 } 
+            },
+          ],
+          totalPrice: { min: 12000, max: 18000 }, // ✅ Added totalPrice
+        },
+      ],
+      selectedSpecializations: ['surgery', 'therapy'],
+      totalEstimate: { min: 15000, max: 26000 },
+      searchCriteria: {
+        priceRange: { min: 15000, max: 30000 },
+        districts: ['Центральный', 'Хамовники'],
+        metro: ['Фрунзенская', 'Пушкинская'],
+      },
+      status: 'published',
+    },
+    {
+      id: 104,
+      patientId: 4,
+      patientAge: 55,
+      patientGender: 'male',
+      createdDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      specializations: [
+        {
+          type: 'periodontics',
+          procedures: [
+            { 
+              procedure: 'Лечение пародонтита', 
+              estimatedPrice: { min: 10000, max: 20000 } 
+            },
+          ],
+          totalPrice: { min: 10000, max: 20000 }, // ✅ Added totalPrice
+        },
+        {
+          type: 'hygiene',
+          procedures: [
+            { 
+              procedure: 'Профессиональная чистка', 
+              estimatedPrice: { min: 4000, max: 6000 } 
+            },
+          ],
+          totalPrice: { min: 4000, max: 6000 }, // ✅ Added totalPrice
+        },
+      ],
+      selectedSpecializations: ['periodontics', 'hygiene'],
+      totalEstimate: { min: 14000, max: 26000 },
+      searchCriteria: {
+        priceRange: { min: 20000, max: 40000 },
+        districts: ['Хамовники'],
+        metro: ['Фрунзенская'],
+      },
+      status: 'published',
+    },
+    {
+      id: 105,
+      patientId: 5,
+      patientAge: 38,
+      patientGender: 'male',
+      createdDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      specializations: [
+        {
+          type: 'orthopedics',
+          procedures: [
+            { 
+              tooth: 14, 
+              procedure: 'Имплант + коронка', 
+              estimatedPrice: { min: 80000, max: 120000 } 
+            },
+          ],
+          totalPrice: { min: 80000, max: 120000 }, // ✅ Added totalPrice
+        },
+        {
+          type: 'therapy',
+          procedures: [
+            { 
+              tooth: 15, 
+              procedure: 'Лечение кариеса', 
+              estimatedPrice: { min: 5000, max: 8000 } 
+            },
+            { 
+              tooth: 25, 
+              procedure: 'Лечение кариеса', 
+              estimatedPrice: { min: 5000, max: 8000 } 
+            },
+          ],
+          totalPrice: { min: 10000, max: 16000 }, // ✅ Added totalPrice
+        },
+      ],
+      selectedSpecializations: ['orthopedics', 'therapy'],
+      totalEstimate: { min: 90000, max: 136000 },
+      searchCriteria: {
+        priceRange: { min: 80000, max: 150000 },
+        districts: ['Центральный', 'Тверской', 'Пресненский'],
+        metro: ['Маяковская', 'Белорусская', 'Пушкинская'],
+      },
+      status: 'published',
+    },
+  ];
+  
+  return HttpResponse.json(mockIncomingPlans);
+}),
+
   
   // Calculate offer for treatment plan
-  http.post('/api/clinic/:id/calculate-offer', async ({ params, request }) => {
-    await delay(800);
-    const { treatmentPlanId, selectedSpecializations } = await request.json();
-    
-    const clinic = clinics.find(c => c.id === Number(params.id));
-    if (!clinic) {
-      return HttpResponse.json(
-        { error: 'Clinic not found' },
-        { status: 404 }
-      );
+// Calculate offer for treatment plan
+http.post('/api/clinic/:id/calculate-offer', async ({ params, request }) => {
+  await delay(800);
+  const { treatmentPlanId, selectedSpecializations } = await request.json();
+  
+  const clinic = clinics.find(c => c.id === Number(params.id));
+  if (!clinic) {
+    return HttpResponse.json(
+      { error: 'Clinic not found' },
+      { status: 404 }
+    );
+  }
+  
+  // Get the incoming plan from our mock data
+  const mockIncomingPlans = [
+    {
+      id: 101,
+      specializations: [
+        {
+          type: 'therapy',
+          procedures: [
+            { tooth: 16, procedure: 'Лечение кариеса', estimatedPrice: { min: 5000, max: 8000 } },
+            { tooth: 26, procedure: 'Пломбирование канала', estimatedPrice: { min: 12000, max: 18000 } },
+          ],
+        },
+        {
+          type: 'hygiene',
+          procedures: [
+            { procedure: 'Профессиональная чистка', estimatedPrice: { min: 4000, max: 6000 } },
+          ],
+        },
+      ],
+    },
+    {
+      id: 102,
+      specializations: [
+        {
+          type: 'orthopedics',
+          procedures: [
+            { tooth: 36, procedure: 'Коронка металлокерамическая', estimatedPrice: { min: 25000, max: 45000 } },
+            { tooth: 46, procedure: 'Коронка металлокерамическая', estimatedPrice: { min: 25000, max: 45000 } },
+          ],
+        },
+      ],
+    },
+    {
+      id: 103,
+      specializations: [
+        {
+          type: 'surgery',
+          procedures: [
+            { tooth: 38, procedure: 'Удаление зуба мудрости', estimatedPrice: { min: 3000, max: 8000 } },
+          ],
+        },
+        {
+          type: 'therapy',
+          procedures: [
+            { tooth: 17, procedure: 'Лечение пульпита', estimatedPrice: { min: 12000, max: 18000 } },
+          ],
+        },
+      ],
+    },
+    {
+      id: 104,
+      specializations: [
+        {
+          type: 'periodontics',
+          procedures: [
+            { procedure: 'Лечение пародонтита', estimatedPrice: { min: 10000, max: 20000 } },
+          ],
+        },
+        {
+          type: 'hygiene',
+          procedures: [
+            { procedure: 'Профессиональная чистка', estimatedPrice: { min: 4000, max: 6000 } },
+          ],
+        },
+      ],
+    },
+    {
+      id: 105,
+      specializations: [
+        {
+          type: 'orthopedics',
+          procedures: [
+            { tooth: 14, procedure: 'Имплант + коронка', estimatedPrice: { min: 80000, max: 120000 } },
+          ],
+        },
+        {
+          type: 'therapy',
+          procedures: [
+            { tooth: 15, procedure: 'Лечение кариеса', estimatedPrice: { min: 5000, max: 8000 } },
+            { tooth: 25, procedure: 'Лечение кариеса', estimatedPrice: { min: 5000, max: 8000 } },
+          ],
+        },
+      ],
+    },
+  ];
+  
+  const plan = mockIncomingPlans.find(p => p.id === treatmentPlanId);
+  
+  if (!plan) {
+    return HttpResponse.json(
+      { error: 'Treatment plan not found' },
+      { status: 404 }
+    );
+  }
+  
+  // Calculate pricing based on clinic's price list
+  const pricing = {};
+  let totalPrice = 0;
+  
+  selectedSpecializations.forEach(specType => {
+    const spec = plan.specializations.find(s => s.type === specType);
+    if (spec) {
+      const breakdown = spec.procedures.map(proc => ({
+        procedure: proc.procedure,
+        tooth: proc.tooth,
+        price: Math.floor((proc.estimatedPrice.min + proc.estimatedPrice.max) / 2),
+      }));
+      
+      const specTotal = breakdown.reduce((sum, item) => sum + item.price, 0);
+      
+      pricing[specType] = {
+        total: specTotal,
+        breakdown,
+      };
+      
+      totalPrice += specTotal;
     }
-    
-    // Find treatment plan
-    let plan = null;
-    patients.forEach(patient => {
-      const found = patient.treatmentPlans.find(tp => tp.id === treatmentPlanId);
-      if (found) plan = found;
-    });
-    
-    if (!plan) {
-      return HttpResponse.json(
-        { error: 'Treatment plan not found' },
-        { status: 404 }
-      );
-    }
-    
-    // Calculate pricing based on clinic's price list
-    const pricing = {};
-    let totalPrice = 0;
-    
-    selectedSpecializations.forEach(specType => {
-      const spec = plan.specializations.find(s => s.type === specType);
-      if (spec) {
-        const breakdown = spec.procedures.map(proc => ({
-          procedure: proc.procedure,
-          price: Math.floor((proc.estimatedPrice.min + proc.estimatedPrice.max) / 2),
-        }));
-        
-        const specTotal = breakdown.reduce((sum, item) => sum + item.price, 0);
-        
-        pricing[specType] = {
-          total: specTotal,
-          breakdown,
-        };
-        
-        totalPrice += specTotal;
-      }
-    });
-    
-    const discountedPrice = Math.floor(totalPrice * (1 - clinic.features.discount / 100));
-    
-    return HttpResponse.json({
-      pricing,
-      totalPrice,
-      discountedPrice,
-      discount: clinic.features.discount,
-    });
-  }),
+  });
+  
+  const discountedPrice = Math.floor(totalPrice * (1 - clinic.features.discount / 100));
+  
+  return HttpResponse.json({
+    pricing,
+    totalPrice,
+    discountedPrice,
+    discount: clinic.features.discount,
+  });
+}),
+
   
   // Submit offer
   http.post('/api/clinic/:id/submit-offer', async ({ params, request }) => {
@@ -377,16 +1140,6 @@ export const handlers = [
     
     offers.push(newOffer);
     
-    // Update treatment plan status
-    patients.forEach(patient => {
-      const plan = patient.treatmentPlans.find(
-        tp => tp.id === offerData.treatmentPlanId
-      );
-      if (plan && plan.status === 'published') {
-        plan.status = 'offers_received';
-      }
-    });
-    
     return HttpResponse.json({
       success: true,
       message: 'Предложение отправлено пациенту',
@@ -394,47 +1147,12 @@ export const handlers = [
     });
   }),
   
-  // Get clinic leads
+  // Get clinic leads - NOW WITH MOCK DATA
   http.get('/api/clinic/:id/leads', async ({ params }) => {
     await delay(500);
     
-    const clinicOffers = offers.filter(
-      o => o.clinicId === Number(params.id) && o.status === 'accepted'
-    );
-    
-    const leads = [];
-    
-    clinicOffers.forEach(offer => {
-      patients.forEach(patient => {
-        const appointment = patient.appointments.find(
-          apt => apt.offerId === offer.id
-        );
-        
-        if (appointment) {
-          const plan = patient.treatmentPlans.find(
-            tp => tp.id === offer.treatmentPlanId
-          );
-          
-          leads.push({
-            id: appointment.id,
-            patient: {
-              id: patient.id,
-              name: patient.name,
-              phone: patient.phone,
-              email: patient.email,
-              age: patient.age,
-            },
-            treatmentPlan: plan,
-            offer,
-            appointment,
-            createdDate: appointment.createdDate,
-            status: appointment.status,
-          });
-        }
-      });
-    });
-    
-    return HttpResponse.json(leads);
+    // Return mock leads
+    return HttpResponse.json(mockLeads);
   }),
   
   // Update lead status
@@ -442,17 +1160,13 @@ export const handlers = [
     await delay(400);
     const { status, notes } = await request.json();
     
-    // Find and update appointment
-    patients.forEach(patient => {
-      const appointment = patient.appointments.find(
-        apt => apt.id === Number(params.leadId)
-      );
-      if (appointment) {
-        appointment.status = status;
-        appointment.notes = notes;
-        appointment.updatedDate = new Date().toISOString();
-      }
-    });
+    // Find and update lead in mock data
+    const lead = mockLeads.find(l => l.id === Number(params.leadId));
+    if (lead) {
+      lead.status = status;
+      lead.notes = notes;
+      lead.updatedDate = new Date().toISOString();
+    }
     
     return HttpResponse.json({
       success: true,
@@ -460,32 +1174,22 @@ export const handlers = [
     });
   }),
   
-  // Get clinic analytics
+  // Get clinic analytics - UPDATED WITH MORE REALISTIC DATA
   http.get('/api/clinic/:id/analytics', async ({ params, request }) => {
     await delay(700);
     const url = new URL(request.url);
-    const period = url.searchParams.get('period') || '30'; // days
-    
-    const clinicOffers = offers.filter(o => o.clinicId === Number(params.id));
-    const acceptedOffers = clinicOffers.filter(o => o.status === 'accepted');
-    
-    const totalPlanned = clinicOffers.reduce((sum, o) => sum + o.totalPrice, 0);
-    const totalActual = acceptedOffers.reduce((sum, o) => sum + o.totalPrice, 0);
+    const period = url.searchParams.get('period') || '30';
     
     return HttpResponse.json({
       period,
       metrics: {
-        newPlans: clinicOffers.length,
-        acceptedOffers: acceptedOffers.length,
-        rejectedOffers: clinicOffers.filter(o => o.status === 'rejected').length,
-        conversionRate: clinicOffers.length > 0 
-          ? Math.round((acceptedOffers.length / clinicOffers.length) * 100) 
-          : 0,
-        totalPlannedRevenue: totalPlanned,
-        totalActualRevenue: totalActual,
-        averageOrderValue: acceptedOffers.length > 0
-          ? Math.round(totalActual / acceptedOffers.length)
-          : 0,
+        newPlans: 15,
+        acceptedOffers: 8,
+        rejectedOffers: 3,
+        conversionRate: 53,
+        totalPlannedRevenue: 1500000,
+        totalActualRevenue: 950000,
+        averageOrderValue: 118750,
       },
       bySpecialization: {
         therapy: { count: 12, revenue: 250000 },
@@ -497,6 +1201,7 @@ export const handlers = [
     });
   }),
 
+
   // ============= GENERAL ENDPOINTS =============
   
   // Search clinics
@@ -505,7 +1210,7 @@ export const handlers = [
     const url = new URL(request.url);
     const specialization = url.searchParams.get('specialization');
     const district = url.searchParams.get('district');
-    const priceRange = url.searchParams.get('priceRange'); // 'low', 'medium', 'high'
+    const priceRange = url.searchParams.get('priceRange');
     
     let filteredClinics = [...clinics];
     

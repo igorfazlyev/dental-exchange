@@ -15,6 +15,7 @@ import AppointmentsPage from './features/patient/AppointmentsPage';
 import ClinicDashboard from './features/clinic/ClinicDashboard';
 import IncomingPlansPage from './features/clinic/IncomingPlansPage';
 import LeadsPage from './features/clinic/LeadsPage';
+import PatientProfile from './features/patient/PatientProfile';
 
 // Protected Route Component
 function ProtectedRoute({ children, allowedRoles }) {
@@ -84,7 +85,7 @@ function App() {
           path="/patient/profile"
           element={
             <ProtectedRoute allowedRoles={['patient']}>
-              <PatientDashboard />
+              <PatientProfile />
             </ProtectedRoute>
           }
         />

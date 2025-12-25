@@ -10,7 +10,17 @@ import {
 import { formatPriceRange, formatDate } from '../../utils/formatters';
 import { SPECIALIZATIONS } from '../../api/mockData/specializations';
 
+
 export default function IncomingPlanCard({ plan, onCalculate }) {
+  // Helper to format price range object
+  const formatPriceRangeObject = (priceRange) => {
+    if (!priceRange) return '';
+    if (typeof priceRange === 'object' && priceRange.min && priceRange.max) {
+      return formatPriceRange(priceRange.min, priceRange.max);
+    }
+    return String(priceRange);
+  };
+
   return (
     <Card sx={{ mb: 2 }}>
       <CardContent>
@@ -27,11 +37,14 @@ export default function IncomingPlanCard({ plan, onCalculate }) {
           <Chip label="Новый" color="success" size="small" />
         </Box>
 
+
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          Ориентировочная стоимость: {formatPriceRange(plan.totalEstimate.min, plan.totalEstimate.max)}
+          Ориентировочная стоимость: {plan.totalEstimate?.toLocaleString?.('ru-RU') || plan.totalEstimate} ₽
         </Typography>
 
+
         <Divider sx={{ my: 2 }} />
+
 
         <Typography variant="subtitle2" gutterBottom>
           Требуемые специализации:
@@ -50,18 +63,20 @@ export default function IncomingPlanCard({ plan, onCalculate }) {
           })}
         </Box>
 
+
         {plan.searchCriteria && (
           <>
             <Typography variant="subtitle2" gutterBottom>
               Критерии пациента:
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {plan.searchCriteria.district && `Район: ${plan.searchCriteria.district}`}
-              {plan.searchCriteria.metro && ` • Метро: ${plan.searchCriteria.metro}`}
-              {plan.searchCriteria.priceRange && ` • Ценовой сегмент: ${plan.searchCriteria.priceRange}`}
+              {plan.searchCriteria.districts?.length > 0 && `Район: ${plan.searchCriteria.districts.join(', ')}`}
+              {plan.searchCriteria.metro?.length > 0 && ` • Метро: ${plan.searchCriteria.metro.join(', ')}`}
+              {plan.searchCriteria.priceRange && ` • Ценовой сегмент: ${formatPriceRangeObject(plan.searchCriteria.priceRange)}`}
             </Typography>
           </>
         )}
+
 
         <Button
           variant="contained"
